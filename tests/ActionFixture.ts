@@ -23,6 +23,7 @@ export class ActionFixture {
   private githubStepSummary: string = '';
   private outputPath: string = '';
   private outputs: Record<string, string> = {};
+  private logs: string[] = [];
 
   constructor(public branch: string = 'main') {}
 
@@ -32,8 +33,27 @@ export class ActionFixture {
 
   async initialize(): Promise<void> {
     jest.spyOn(process.stdout, 'write').mockImplementation(() => true);
-    jest.spyOn(core, 'error').mockImplementation(() => {});
     jest.spyOn(core, 'setFailed').mockImplementation(() => {});
+
+    const logger = (level, arg) => {
+      this.logs.push(`[${level}] ${arg}`);
+    };
+
+    jest.spyOn(core, 'debug').mockImplementation((arg) => {
+      logger('debug', arg);
+    });
+    jest.spyOn(core, 'info').mockImplementation((arg) => {
+      logger('info', arg);
+    });
+    jest.spyOn(core, 'notice').mockImplementation((arg) => {
+      logger('notice', arg);
+    });
+    jest.spyOn(core, 'warning').mockImplementation((arg) => {
+      logger('warning', arg);
+    });
+    jest.spyOn(core, 'error').mockImplementation((arg) => {
+      logger('error', arg);
+    });
 
     this.tempDir = await createTemporaryDirectory();
     this.githubStepSummary = path.join(this.tempDir, 'github-step-summary.md');
@@ -57,6 +77,10 @@ export class ActionFixture {
       const key = lines[index].split('<<')[0];
       const value = lines[index + 1];
       this.outputs[key] = value;
+    }
+
+    for (const message of this.logs) {
+      console.log(message);
     }
   }
 
@@ -100,6 +124,7 @@ export class ActionFixture {
       GITHUB_STEP_SUMMARY: this.githubStepSummary,
       INPUT_BRANCH: this.branch,
       INPUT_REPOSITORY: this.tempDir,
+      RUNNER_DEBUG: '1',
     };
 
     for (const key in inputs) {
