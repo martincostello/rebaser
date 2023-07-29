@@ -13,10 +13,10 @@ import { tryResolveConflicts } from './Resolver';
 async function rebase(git: SimpleGit, options: TaskOptions): Promise<boolean> {
   try {
     const result = await git.rebase(options);
-    core.debug(result);
+    core.debug(`Rebase result:\n${result}`);
     return true;
   } catch (error: any) {
-    core.debug(error);
+    core.debug(`Rebase error:\n${error}`);
     return false;
   }
 }
