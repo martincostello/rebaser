@@ -1,0 +1,19 @@
+version: 2
+updates:
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "05:30"
+    timezone: Europe/London
+  reviewers:
+    - "martincostello"
+- package-ecosystem: "npm"
+  directory: "/"
+  schedule:
+    interval: "daily"
+    time: "05:30"
+    timezone: Europe/London
+  reviewers:
+    - "martincostello"
+  open-pull-requests-limit: 99

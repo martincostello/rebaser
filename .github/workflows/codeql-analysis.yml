@@ -1,0 +1,57 @@
+name: code-scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 6 * * MON'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  code-ql:
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      security-events: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+
+    - name: Setup Node
+      uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3.7.0
+      with:
+        node-version: '16'
+
+    - name: Get npm cache directory
+      id: npm-cache-dir
+      shell: pwsh
+      run: echo "dir=$(npm config get cache)" >> ${env:GITHUB_OUTPUT}
+
+    - name: Setup npm cache
+      uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
+      id: npm-cache
+      with:
+        path: ${{ steps.npm-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: ${{ runner.os }}-node-
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@cdcdbb579706841c47f7063dda365e292e5cad7a # v2.13.4
+      with:
+        languages: 'javascript'
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@cdcdbb579706841c47f7063dda365e292e5cad7a # v2.13.4
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@cdcdbb579706841c47f7063dda365e292e5cad7a # v2.13.4
+      with:
+        category: "/language:javascript"

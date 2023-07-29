@@ -1,0 +1,73 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  FORCE_COLOR: 1
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            codecov_os: macos
+          - os: ubuntu-latest
+            codecov_os: linux
+          - os: windows-latest
+            codecov_os: windows
+
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+
+    - name: Setup Node
+      uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3.7.0
+      with:
+        node-version: '16.x'
+
+    - name: Install packages
+      shell: pwsh
+      run: |
+        npm install --global @vercel/ncc
+        npm ci
+
+    - name: Build and Test
+      shell: pwsh
+      run: ./build.ps1
+
+    - uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3.1.4
+      name: Upload coverage to Codecov
+      with:
+        file: ./coverage/lcov.info
+        flags: ${{ matrix.codecov_os }}
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+
+    - name: Lint GitHub Actions workflows
+      shell: bash
+      env:
+        ACTIONLINT_VERSION: '7b75d16d41920ec126e6f3269db0c6f3ab613c38' # v1.6.25
+      run: |
+        echo "::add-matcher::.github/actionlint-matcher.json"
+        bash <(curl --silent --show-error "https://raw.githubusercontent.com/rhysd/actionlint/${ACTIONLINT_VERSION}/scripts/download-actionlint.bash")
+        ./actionlint -color
