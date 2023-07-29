@@ -9,11 +9,12 @@ describe('rebaser', () => {
   let fixture: ActionFixture;
 
   beforeAll(async () => {
-    fixture = new ActionFixture();
-    await fixture.initialize();
+    const randomString = () => Math.random().toString(36).substring(7);
+    const baseBranch = randomString();
+    const headBranch = randomString();
 
-    const defaultBranch = 'main';
-    const otherBranch = 'my-branch';
+    fixture = new ActionFixture(baseBranch);
+    await fixture.initialize();
 
     const globalJson = (version: string) => `{
       "sdk":{
@@ -23,19 +24,19 @@ describe('rebaser', () => {
 
     const globalJsonName = 'global.json';
 
-    await fixture.checkout(defaultBranch);
+    await fixture.checkout(baseBranch, true);
     await fixture.writeFile(globalJsonName, globalJson('7.0.100'));
     await fixture.commit('Add global.json');
 
-    await fixture.checkout(otherBranch, true);
+    await fixture.checkout(headBranch, true);
     await fixture.writeFile(globalJsonName, globalJson('8.0.100'));
     await fixture.commit('Update .NET SDK to 8.0.100');
 
-    await fixture.checkout(defaultBranch);
+    await fixture.checkout(baseBranch);
     await fixture.writeFile(globalJsonName, globalJson('7.0.101'));
     await fixture.commit('Update .NET SDK to 7.0.101');
 
-    await fixture.checkout(otherBranch);
+    await fixture.checkout(headBranch);
   });
 
   afterAll(async () => {
