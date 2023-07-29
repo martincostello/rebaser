@@ -38,7 +38,11 @@ export async function tryRebase(options: { branch: string; repository: string })
 
   const git = simpleGit({
     baseDir: options.repository,
-    config: ['core.editor=true'], // Do not open editor for commit messages
+    config: [
+      'core.editor=true', // Do not open editor for commit messages
+      'user.email=github-actions[bot]@users.noreply.github.com',
+      'user.name=github-actions[bot]',
+    ],
   });
 
   let abort = false;
