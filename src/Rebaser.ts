@@ -12,7 +12,8 @@ import { tryResolveConflicts } from './Resolver';
 
 async function rebase(git: SimpleGit, options: TaskOptions): Promise<boolean> {
   try {
-    await git.rebase(options);
+    const result = await git.rebase(options);
+    core.debug(result);
     return true;
   } catch (error: any) {
     core.debug(error);
