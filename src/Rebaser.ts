@@ -22,6 +22,7 @@ async function rebase(git: SimpleGit, options: TaskOptions): Promise<boolean> {
 
 async function getFilesWithConflicts(git: SimpleGit, repository: string): Promise<string[]> {
   const conflicts = await git.diff(['--name-only', '--diff-filter=U', '--relative']);
+  core.debug(`Files with conflicts:\n${conflicts}`);
   const paths = conflicts
     .split('\n')
     .filter((p) => p.length > 0)
