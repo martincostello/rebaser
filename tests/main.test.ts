@@ -52,12 +52,16 @@ describe('rebaser', () => {
       expect(core.setFailed).toHaveBeenCalledTimes(0);
     });
 
-    test('outputs whether the branch was rebased', () => {
+    test('outputs that the branch was rebased', () => {
       expect(fixture.getOutput('rebased')).toBe('true');
     });
 
     test('rebases the branch', async () => {
       expect(await fixture.commitHistory(3)).toEqual(['Update .NET SDK to 8.0.100', 'Update .NET SDK to 7.0.101', 'Add global.json']);
+    });
+
+    test('output logs', async () => {
+      expect(fixture.logs).toEqual([]);
     });
   });
 });

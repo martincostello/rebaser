@@ -23,7 +23,7 @@ export class ActionFixture {
   private githubStepSummary: string = '';
   private outputPath: string = '';
   private outputs: Record<string, string> = {};
-  private logs: string[] = [];
+  public logs: string[] = [];
 
   constructor(public branch: string = 'main') {}
 
