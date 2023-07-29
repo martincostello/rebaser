@@ -1,0 +1,21 @@
+name: 'Rebase Branch'
+description: 'Attempts to rebase the current branch of a Git repository.'
+author: 'Martin Costello'
+branding:
+  icon: 'git-branch'
+  color: 'green'
+inputs:
+  branch:
+    description: 'The optional branch to rebase the current branch onto.'
+    required: false
+    default: ''
+  repository:
+    description: 'The optional path of the repository to rebase.'
+    required: false
+    default: ''
+outputs:
+  rebased:
+    description: 'Whether the branch was successfully rebased.'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
