@@ -66,6 +66,8 @@ jobs:
 |:--|:--|:--|
 | `branch` | The branch to rebase the current branch onto. | `github.event.repository.default_branch` |
 | `repository` | The path of the repository to rebase. | `'.'` |
+| `user-email` | The optional email address to use for Git commit(s). | `github-actions[bot]@users.noreply.github.com` |
+| `user-name` | The optional user name to use for Git commit(s). | `github-actions[bot]` |
 
 ## Outputs
 

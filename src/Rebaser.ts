@@ -33,15 +33,15 @@ async function getFilesWithConflicts(git: SimpleGit, repository: string): Promis
   return paths.reverse();
 }
 
-export async function tryRebase(options: { branch: string; repository: string }): Promise<boolean> {
+export async function tryRebase(options: { branch: string; repository: string; userEmail: string; userName: string }): Promise<boolean> {
   core.debug(`Rebasing '${options.branch}' branch in '${options.repository}'.`);
 
   const git = simpleGit({
     baseDir: options.repository,
     config: [
       'core.editor=true', // Do not open editor for commit messages
-      'user.email=github-actions[bot]@users.noreply.github.com',
-      'user.name=github-actions[bot]',
+      `user.email=${options.userEmail}`,
+      `user.name=${options.userName}`,
     ],
   });
 

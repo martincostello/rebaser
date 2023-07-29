@@ -12,6 +12,8 @@ export async function run(): Promise<void> {
     const options = {
       branch: core.getInput('branch', { required: false }) || context.payload.repository?.['default_branch'] || 'main',
       repository: core.getInput('repository', { required: false }) || process.cwd(),
+      userEmail: core.getInput('user-email', { required: false }) || 'github-actions[bot]@users.noreply.github.com',
+      userName: core.getInput('user-name', { required: false }) || 'github-actions[bot]',
     };
 
     let rebased = false;
