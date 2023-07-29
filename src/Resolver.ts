@@ -102,7 +102,7 @@ async function tryResolvePackageConflicts(path: string): Promise<boolean> {
 
 export async function tryResolveConflicts(path: string): Promise<boolean> {
   core.debug(`Attempting to resolve conflicts in '${path}'`);
-  if (basename(path).endsWith('package-lock.json')) {
+  if (basename(path) === 'package-lock.json') {
     return await tryResolveNpmLockFileConflicts(path);
   } else {
     return await tryResolvePackageConflicts(path);
