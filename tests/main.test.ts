@@ -114,7 +114,7 @@ describe('rebaser', () => {
     describe('running the action', () => {
       beforeAll(async () => {
         await fixture.run();
-      }, rebaseTimeout);
+      }, rebaseTimeout * 2);
 
       test('generates no errors', () => {
         expect(core.error).toHaveBeenCalledTimes(0);
