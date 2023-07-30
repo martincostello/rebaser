@@ -53,7 +53,7 @@ export class ActionFixture {
     const fixturePath = path.join(__dirname, 'fixtures', name);
 
     const applyContent = async (dir: string): Promise<void> => {
-      await io.cp(dir, this.tempDir, { recursive: true, force: true, copySourceDirectory: false });
+      await io.cp(dir, this.tempDir, { recursive: true, copySourceDirectory: false });
     };
 
     await this.setupRepository(
