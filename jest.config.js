@@ -1,7 +1,6 @@
 module.exports = {
   clearMocks: true,
   moduleFileExtensions: [ 'js', 'ts' ],
-  prettierPath: null,
   reporters: [
     'default',
     'github-actions'
