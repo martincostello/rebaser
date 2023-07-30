@@ -145,6 +145,11 @@ export class ActionFixture {
     await commitChanges(this.tempDir, message);
   }
 
+  async diff(count: number = 1): Promise<string[]> {
+    const fileNames = await execGit(['diff', `HEAD~${count}`, 'HEAD', '--name-only'], this.tempDir);
+    return fileNames.split('\n').filter((p) => p.length > 0);
+  }
+
   async writeFile(name: string, content: string): Promise<void> {
     const filePath = path.join(this.tempDir, name);
     await fs.promises.writeFile(filePath, content);

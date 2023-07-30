@@ -43,7 +43,7 @@ describe('rebaser', () => {
         expect(await fixture.commitHistory(3)).toEqual(['Apply target', 'Apply patch', 'Apply base']);
       });
 
-      test('has the correct SDK version', async () => {
+      test('matches the snapshot', async () => {
         expect(await fixture.getFileContent('global.json')).toMatchInlineSnapshot(`
 "{
   "sdk": {
@@ -86,13 +86,63 @@ describe('rebaser', () => {
         expect(await fixture.commitHistory(3)).toEqual(['Apply target', 'Apply patch', 'Apply base']);
       });
 
-      test('has the correct dependencies', async () => {
+      test('matches the snapshot', async () => {
         expect(await fixture.getFileContent('Directory.Packages.props')).toMatchInlineSnapshot(`
 "<Project>
   <ItemGroup>
     <PackageVersion Include="System.Text.Json" Version="8.0.0" />
   </ItemGroup>
 </Project>
+"
+`);
+      });
+    });
+  });
+
+  describe('when package.json has conflicts', () => {
+    let fixture: ActionFixture;
+
+    beforeAll(async () => {
+      fixture = await createFixture();
+      await fixture.setupRepositoryFromFixture('package.json');
+    });
+
+    afterAll(async () => {
+      await fixture.destroy();
+    });
+
+    describe('running the action', () => {
+      beforeAll(async () => {
+        await fixture.run();
+      }, rebaseTimeout);
+
+      test('generates no errors', () => {
+        expect(core.error).toHaveBeenCalledTimes(0);
+        expect(core.setFailed).toHaveBeenCalledTimes(0);
+      });
+
+      test('outputs that the branch was rebased', () => {
+        expect(fixture.getOutput('rebased')).toBe('true');
+      });
+
+      test('rebases the branch', async () => {
+        expect(await fixture.commitHistory(3)).toEqual(['Apply target', 'Apply patch', 'Apply base']);
+      });
+
+      test('regenerates the lock file', async () => {
+        expect(await fixture.diff(3)).toContain('package-lock.json');
+      });
+
+      test('matches the snapshot', async () => {
+        expect(await fixture.getFileContent('package.json')).toMatchInlineSnapshot(`
+"{
+  "name": "rebaser",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@microsoft/signalr": "^8.0.0-preview.6.23329.11"
+  }
+}
 "
 `);
       });
