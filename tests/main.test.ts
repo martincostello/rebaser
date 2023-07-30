@@ -186,4 +186,32 @@ describe('rebaser', () => {
       expect(await fixture.getFileContent('Directory.Packages.props')).toMatchSnapshot();
     });
   });
+
+  describe('when branch is up-to-date', () => {
+    let fixture: ActionFixture;
+
+    beforeAll(async () => {
+      fixture = await runFixture('global.json');
+      fixture.reset();
+
+      await fixture.run();
+    }, rebaseTimeout);
+
+    afterAll(async () => {
+      await fixture?.destroy();
+    });
+
+    test('generates no errors', () => {
+      expect(core.error).toHaveBeenCalledTimes(0);
+      expect(core.setFailed).toHaveBeenCalledTimes(0);
+    });
+
+    test('outputs that the branch was not rebased', () => {
+      expect(fixture.getOutput('rebased')).toBe('false');
+    });
+
+    test('matches the snapshot', async () => {
+      expect(await fixture.getFileContent('global.json')).toMatchSnapshot();
+    });
+  });
 });

@@ -107,6 +107,12 @@ export class ActionFixture {
     }
   }
 
+  async reset(): Promise<void> {
+    await createEmptyFile(this.githubStepSummary);
+    await createEmptyFile(this.outputPath);
+    this.outputs = {};
+  }
+
   async destroy(): Promise<void> {
     try {
       await io.rmRF(this.tempDir);

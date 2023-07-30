@@ -55,6 +55,15 @@ exports[`rebaser when a solution has multiple conflicts packages matches the sna
 "
 `;
 
+exports[`rebaser when branch is up-to-date matches the snapshot 1`] = `
+"{
+  "sdk": {
+    "version": "8.0.100-preview.6.23330.14"
+  }
+}
+"
+`;
+
 exports[`rebaser when global.json has conflicts matches the snapshot 1`] = `
 "{
   "sdk": {
