@@ -131,7 +131,15 @@ ${nugetPackages.map((nuget) => `    <PackageVersion Include="${nuget.name}" Vers
       });
 
       test('has the correct dependencies', async () => {
-        expect(await fixture.getFileContent(directoryPackagesPropsName)).toMatchSnapshot();
+        expect(await fixture.getFileContent(directoryPackagesPropsName)).toMatchInlineSnapshot(`
+"
+<Project>
+<ItemGroup>
+    <PackageVersion Include="System.Text.Json" Version="8.0.0" />
+</ItemGroup>
+</Project>
+    "
+`);
       });
     });
   });
