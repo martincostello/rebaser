@@ -85,19 +85,19 @@ export async function tryRebase(options: { branch: string; repository: string; u
 
   switch (result) {
     case RebaseResult.conflicts:
-      core.warning(`The '${options.branch}' branch could not be rebased due to conflicts that could not be automatically resolved.`);
+      core.warning(`'${options.branch}' could not be rebased due to conflicts that could not be automatically resolved.`);
       break;
 
     case RebaseResult.error:
-      core.error(`Failed to rebase the '${options.branch}' branch due to an error.`);
+      core.error(`Failed to rebase '${options.branch}' due to an error.`);
       break;
 
     case RebaseResult.success:
-      core.info(`The '${options.branch}' branch was successfully rebased.`);
+      core.info(`'${options.branch}' was successfully rebased.`);
       break;
 
     case RebaseResult.upToDate:
-      core.info(`The '${options.branch}' branch is already up to date.`);
+      core.info(`'${options.branch}' is already up to date.`);
       break;
 
     default:
