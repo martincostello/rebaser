@@ -16,14 +16,7 @@ export async function run(): Promise<void> {
       userName: core.getInput('user-name', { required: false }) || 'github-actions[bot]',
     };
 
-    let rebased = false;
-
-    try {
-      rebased = await tryRebase(options);
-    } catch (error: any) {
-      core.setFailed(`Failed to rebase the '${options.branch}' branch.`);
-      throw error;
-    }
+    const rebased = await tryRebase(options);
 
     core.setOutput('rebased', rebased);
   } catch (error: any) {

@@ -34,7 +34,7 @@ async function getFilesWithConflicts(git: SimpleGit, repository: string): Promis
 }
 
 export async function tryRebase(options: { branch: string; repository: string; userEmail: string; userName: string }): Promise<boolean> {
-  core.debug(`Rebasing '${options.branch}' branch in '${options.repository}'.`);
+  core.debug(`Rebasing '${options.branch}' branch in '${options.repository}'`);
 
   const git = simpleGit({
     baseDir: options.repository,
@@ -83,8 +83,25 @@ export async function tryRebase(options: { branch: string; repository: string; u
 
   core.debug(`Rebase result: ${result}`);
 
-  if (result === RebaseResult.success) {
-    core.info(`Rebased '${options.branch}' branch in '${options.repository}'.`);
+  switch (result) {
+    case RebaseResult.conflicts:
+      core.warning(`The '${options.branch}' branch could not be rebased due to conflicts that could not be automatically resolved.`);
+      break;
+
+    case RebaseResult.error:
+      core.error(`Failed to rebase the '${options.branch}' branch due to an error.`);
+      break;
+
+    case RebaseResult.success:
+      core.info(`The '${options.branch}' branch was successfully rebased.`);
+      break;
+
+    case RebaseResult.upToDate:
+      core.info(`The '${options.branch}' branch is already up to date.`);
+      break;
+
+    default:
+      break;
   }
 
   return result === RebaseResult.success;
