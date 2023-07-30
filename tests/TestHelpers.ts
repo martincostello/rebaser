@@ -30,6 +30,7 @@ export async function createGitRepo(path: string): Promise<void> {
 
   const ignores = ['.DS_Store', '.vscode', 'bin', 'obj', 'node_modules'];
   await fs.promises.writeFile(join(path, '.gitignore'), ignores.join('\n'));
+  await fs.promises.writeFile(join(path, '.gitattributes'), '* text=auto eol=lf');
 
   await commitChanges(path, 'Initial commit');
 }
