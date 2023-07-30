@@ -28,8 +28,8 @@ export class ActionFixture {
 
   constructor() {
     const randomString = () => Math.random().toString(36).substring(7);
-    this.baseBranch = randomString();
-    this.targetBranch = randomString();
+    this.baseBranch = `base-${randomString()}`;
+    this.targetBranch = `target-${randomString()}`;
   }
 
   get path(): string {
