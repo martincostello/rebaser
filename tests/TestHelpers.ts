@@ -22,6 +22,8 @@ export async function createGitRepo(path: string): Promise<void> {
   };
 
   await git('init');
+  await git('config', 'core.autocrlf', 'false');
+  await git('config', 'core.eol', 'lf');
   await git('config', 'core.safecrlf', 'false');
   await git('config', 'user.email', 'test@test.local');
   await git('config', 'user.name', 'test');
