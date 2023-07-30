@@ -210,8 +210,41 @@ describe('rebaser', () => {
       expect(fixture.getOutput('rebased')).toBe('false');
     });
 
+    test('the branch is still rebased from before', async () => {
+      expect(await fixture.commitHistory(3)).toEqual(['Apply target', 'Apply patch', 'Apply base']);
+    });
+
     test('matches the snapshot', async () => {
       expect(await fixture.getFileContent('global.json')).toMatchSnapshot();
+    });
+  });
+
+  describe('when branch is up-to-date', () => {
+    let fixture: ActionFixture;
+
+    beforeAll(async () => {
+      fixture = await runFixture('Unresolvable');
+    }, rebaseTimeout);
+
+    afterAll(async () => {
+      await fixture?.destroy();
+    });
+
+    test('generates no errors', () => {
+      expect(core.error).toHaveBeenCalledTimes(0);
+      expect(core.setFailed).toHaveBeenCalledTimes(0);
+    });
+
+    test('outputs that the branch was not rebased', () => {
+      expect(fixture.getOutput('rebased')).toBe('false');
+    });
+
+    test('aborts the rebase', async () => {
+      expect(await fixture.commitHistory(3)).toEqual(['Apply target', 'Apply base', 'Initial commit']);
+    });
+
+    test('matches the snapshot', async () => {
+      expect(await fixture.getFileContent('Directory.Packages.props')).toMatchSnapshot();
     });
   });
 });
