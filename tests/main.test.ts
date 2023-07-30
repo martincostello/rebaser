@@ -6,7 +6,7 @@ import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
 import { ActionFixture } from './ActionFixture';
 
 describe('rebaser', () => {
-  const rebaseTimeout = 1500000;
+  const rebaseTimeout = 15000;
   const runFixture = async (name: string = ''): Promise<ActionFixture> => {
     const fixture = new ActionFixture();
     await fixture.initialize();
