@@ -19,12 +19,18 @@ import {
 import { run } from '../src/main';
 
 export class ActionFixture {
+  public baseBranch: string;
+  public targetBranch: string;
   private tempDir: string = '';
   private githubStepSummary: string = '';
   private outputPath: string = '';
   private outputs: Record<string, string> = {};
 
-  constructor(public branch: string = 'main') {}
+  constructor() {
+    const randomString = () => Math.random().toString(36).substring(7);
+    this.baseBranch = randomString();
+    this.targetBranch = randomString();
+  }
 
   get path(): string {
     return this.tempDir;
@@ -41,6 +47,27 @@ export class ActionFixture {
 
     this.setupEnvironment();
     this.setupMocks();
+  }
+
+  async setupRepository(
+    setupBase: (branch: string) => Promise<void>,
+    setupTarget: (branch: string) => Promise<void>,
+    setupConflicts: (branch: string) => Promise<void>
+  ): Promise<void> {
+    // Create the initial branch and seed it
+    await this.checkout(this.baseBranch, true);
+    await setupBase(this.baseBranch);
+
+    // Create the target branch and seed it
+    await this.checkout(this.targetBranch, true);
+    await setupTarget(this.targetBranch);
+
+    // Create conflicts on the base branch
+    await this.checkout(this.baseBranch);
+    await setupConflicts(this.baseBranch);
+
+    // Check out the target branch ready to rebase
+    await this.checkout(this.targetBranch);
   }
 
   async run(): Promise<void> {
@@ -95,7 +122,7 @@ export class ActionFixture {
     const inputs = {
       GITHUB_OUTPUT: this.outputPath,
       GITHUB_STEP_SUMMARY: this.githubStepSummary,
-      INPUT_BRANCH: this.branch,
+      INPUT_BRANCH: this.baseBranch,
       INPUT_REPOSITORY: this.tempDir,
       RUNNER_DEBUG: '1',
     };
