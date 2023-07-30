@@ -1,4 +1,8 @@
 .DS_Store/
+.idea/
+.vs/
 coverage/
 lib/
 node_modules/
+
+*.sln
