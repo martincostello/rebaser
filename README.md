@@ -56,7 +56,7 @@ jobs:
         id: rebase
 
       - name: Push changes
-        if : ${{ steps.rebase.outputs.rebased == 'true' }}
+        if : ${{ steps.rebase.outputs.result == 'success' }}
         run: git push --force-with-lease origin ${{ inputs.branch }}
 ```
 
