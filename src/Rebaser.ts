@@ -99,9 +99,6 @@ export async function tryRebase(options: { branch: string; repository: string; u
     case RebaseResult.upToDate:
       core.info(`${options.branch} is already up to date.`);
       break;
-
-    default:
-      break;
   }
 
   return result === RebaseResult.success;

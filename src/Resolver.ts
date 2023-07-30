@@ -62,12 +62,6 @@ async function tryResolvePackageConflicts(path: string): Promise<boolean> {
         const theirLine = theirs[j];
         const ourLine = ours[j];
 
-        if (ourLine === theirLine) {
-          merged.push(ourLine);
-          resolvedConflict = true;
-          continue;
-        }
-
         const theirVersion = tryParseVersion(theirLine);
         const ourVersion = tryParseVersion(ourLine);
 
