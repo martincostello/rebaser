@@ -22,8 +22,8 @@ inputs:
     required: false
     default: 'github-actions[bot]'
 outputs:
-  rebased:
-    description: 'Whether the branch was successfully rebased.'
+  result:
+    description: 'The result of attempting to rebase the branch. The value is one of: upToDate, success, conflicts or error.'
 runs:
   using: 'node16'
   main: 'dist/index.js'

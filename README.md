@@ -73,7 +73,7 @@ jobs:
 
 | **Name** | **Description** |
 |:--|:--|
-| `rebased` | Whether the branch was successfully rebased. |
+| `result` | The result of attempting to rebase the branch. The value is one of: `upToDate`, `success`, `conflicts` or `error`. |
 
 ## Feedback
 

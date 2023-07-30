@@ -33,7 +33,12 @@ async function getFilesWithConflicts(git: SimpleGit, repository: string): Promis
   return paths.reverse();
 }
 
-export async function tryRebase(options: { branch: string; repository: string; userEmail: string; userName: string }): Promise<boolean> {
+export async function tryRebase(options: {
+  branch: string;
+  repository: string;
+  userEmail: string;
+  userName: string;
+}): Promise<RebaseResult> {
   core.debug(`Rebasing '${options.branch}' branch in '${options.repository}'`);
 
   const git = simpleGit({
@@ -101,13 +106,13 @@ export async function tryRebase(options: { branch: string; repository: string; u
       break;
   }
 
-  return result === RebaseResult.success;
+  return result;
 }
 
 // eslint-disable-next-line no-shadow
 export enum RebaseResult {
-  upToDate = 0,
-  success = 1,
-  conflicts = 2,
-  error = 3,
+  upToDate = 'upToDate',
+  success = 'success',
+  conflicts = 'conflicts',
+  error = 'error',
 }
