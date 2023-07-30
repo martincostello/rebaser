@@ -57,5 +57,11 @@ describe('rebaser', () => {
     test('rebases the branch', async () => {
       expect(await fixture.commitHistory(3)).toEqual(['Update .NET SDK to 8.0.100', 'Update .NET SDK to 7.0.101', 'Add global.json']);
     });
+
+    test('has the correct SDK version', async () => {
+      const content = await fixture.getFileContent('global.json');
+      const globalJson = JSON.parse(content);
+      expect(globalJson?.sdk?.version).toEqual('8.0.100');
+    });
   });
 });

@@ -92,6 +92,15 @@ export class ActionFixture {
     }
   }
 
+  async getFileContent(name: string): Promise<string> {
+    const fileName = this.getFileName(name);
+    return await fs.promises.readFile(fileName, 'utf8');
+  }
+
+  getFileName(name: string): string {
+    return path.join(this.tempDir, name);
+  }
+
   getOutput(name: string): string {
     return this.outputs[name];
   }
