@@ -3,7 +3,7 @@
 
 import * as exec from '@actions/exec';
 import * as fs from 'fs';
-import * as path from 'path';
+import { join } from 'path';
 import { tmpdir } from 'os';
 
 export async function createEmptyFile(fileName: string) {
@@ -11,7 +11,7 @@ export async function createEmptyFile(fileName: string) {
 }
 
 export async function createTemporaryDirectory(): Promise<string> {
-  return await fs.promises.mkdtemp(path.join(tmpdir(), 'rebaser-'));
+  return await fs.promises.mkdtemp(join(tmpdir(), 'rebaser-'));
 }
 
 export async function createGitRepo(path: string): Promise<void> {
@@ -22,9 +22,16 @@ export async function createGitRepo(path: string): Promise<void> {
   };
 
   await git('init');
+  await git('config', 'core.autocrlf', 'false');
+  await git('config', 'core.eol', 'lf');
   await git('config', 'core.safecrlf', 'false');
   await git('config', 'user.email', 'test@test.local');
   await git('config', 'user.name', 'test');
+
+  const ignores = ['.DS_Store', '.vscode', 'bin', 'obj', 'node_modules', 'github-step-summary.md', 'github-outputs'];
+  await fs.promises.writeFile(join(path, '.gitignore'), ignores.join('\n'));
+  await fs.promises.writeFile(join(path, '.gitattributes'), '* text=auto eol=lf');
+
   await commitChanges(path, 'Initial commit');
 }
 

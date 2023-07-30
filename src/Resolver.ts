@@ -62,22 +62,16 @@ async function tryResolvePackageConflicts(path: string): Promise<boolean> {
         const theirLine = theirs[j];
         const ourLine = ours[j];
 
-        if (ourLine === theirLine) {
-          merged.push(ourLine);
-          resolvedConflict = true;
-          continue;
-        }
-
         const theirVersion = tryParseVersion(theirLine);
         const ourVersion = tryParseVersion(ourLine);
 
         if (theirVersion && ourVersion) {
           if (theirVersion.compareTo(ourVersion) > 0) {
             merged.push(theirLine);
-            core.debug(`Resolved conflict with their version '${theirVersion.toString()}'`);
+            core.debug(`Resolved conflict with their version: ${theirVersion.toString()}`);
           } else {
             merged.push(ourLine);
-            core.debug(`Resolved conflict with our version '${ourVersion.toString()}'`);
+            core.debug(`Resolved conflict with our version: ${ourVersion.toString()}`);
           }
           resolvedConflict = true;
         }

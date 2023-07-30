@@ -1,0 +1,8 @@
+{
+  "name": "rebaser",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@microsoft/signalr": "^7.0.0"
+  }
+}

@@ -13,6 +13,14 @@ inputs:
     description: 'The optional path of the repository to rebase.'
     required: false
     default: ''
+  user-email:
+    description: 'The optional email address to use for Git commit(s).'
+    required: false
+    default: 'github-actions[bot]@users.noreply.github.com'
+  user-name:
+    description: 'The optional user name to use for Git commit(s).'
+    required: false
+    default: 'github-actions[bot]'
 outputs:
   rebased:
     description: 'Whether the branch was successfully rebased.'

@@ -19,42 +19,24 @@ import {
 import { run } from '../src/main';
 
 export class ActionFixture {
+  public baseBranch: string;
+  public targetBranch: string;
   private tempDir: string = '';
   private githubStepSummary: string = '';
   private outputPath: string = '';
   private outputs: Record<string, string> = {};
-  public logs: string[] = [];
 
-  constructor(public branch: string = 'main') {}
+  constructor() {
+    const randomString = () => Math.random().toString(36).substring(7);
+    this.baseBranch = `base-${randomString()}`;
+    this.targetBranch = `target-${randomString()}`;
+  }
 
   get path(): string {
     return this.tempDir;
   }
 
   async initialize(): Promise<void> {
-    jest.spyOn(process.stdout, 'write').mockImplementation(() => true);
-    jest.spyOn(core, 'setFailed').mockImplementation(() => {});
-
-    const logger = (level, arg) => {
-      this.logs.push(`[${level}] ${arg}`);
-    };
-
-    jest.spyOn(core, 'debug').mockImplementation((arg) => {
-      logger('debug', arg);
-    });
-    jest.spyOn(core, 'info').mockImplementation((arg) => {
-      logger('info', arg);
-    });
-    jest.spyOn(core, 'notice').mockImplementation((arg) => {
-      logger('notice', arg);
-    });
-    jest.spyOn(core, 'warning').mockImplementation((arg) => {
-      logger('warning', arg);
-    });
-    jest.spyOn(core, 'error').mockImplementation((arg) => {
-      logger('error', arg);
-    });
-
     this.tempDir = await createTemporaryDirectory();
     this.githubStepSummary = path.join(this.tempDir, 'github-step-summary.md');
     this.outputPath = path.join(this.tempDir, 'github-outputs');
@@ -64,6 +46,51 @@ export class ActionFixture {
     await createGitRepo(this.tempDir);
 
     this.setupEnvironment();
+    this.setupMocks();
+  }
+
+  async setupRepositoryFromFixture(name: string): Promise<void> {
+    const fixturePath = path.join(__dirname, 'fixtures', name);
+
+    const applyContent = async (dir: string): Promise<void> => {
+      await io.cp(dir, this.tempDir, { recursive: true, copySourceDirectory: false });
+    };
+
+    await this.setupRepository(
+      async () => {
+        await applyContent(path.join(fixturePath, 'base'));
+        await this.commit('Apply base');
+      },
+      async () => {
+        await applyContent(path.join(fixturePath, 'target'));
+        await this.commit('Apply target');
+      },
+      async () => {
+        await applyContent(path.join(fixturePath, 'patch'));
+        await this.commit('Apply patch');
+      }
+    );
+  }
+
+  async setupRepository(
+    setupBase: (branch: string) => Promise<void>,
+    setupTarget: (branch: string) => Promise<void>,
+    setupConflicts: (branch: string) => Promise<void>
+  ): Promise<void> {
+    // Create the initial branch and seed it
+    await this.checkout(this.baseBranch, true);
+    await setupBase(this.baseBranch);
+
+    // Create the target branch and seed it
+    await this.checkout(this.targetBranch, true);
+    await setupTarget(this.targetBranch);
+
+    // Create conflicts on the base branch
+    await this.checkout(this.baseBranch);
+    await setupConflicts(this.baseBranch);
+
+    // Check out the target branch ready to rebase
+    await this.checkout(this.targetBranch);
   }
 
   async run(): Promise<void> {
@@ -78,10 +105,12 @@ export class ActionFixture {
       const value = lines[index + 1];
       this.outputs[key] = value;
     }
+  }
 
-    for (const message of this.logs) {
-      console.log(message);
-    }
+  async reset(): Promise<void> {
+    await createEmptyFile(this.githubStepSummary);
+    await createEmptyFile(this.outputPath);
+    this.outputs = {};
   }
 
   async destroy(): Promise<void> {
@@ -90,6 +119,15 @@ export class ActionFixture {
     } catch {
       console.log(`Failed to remove fixture directory '${this.path}'.`);
     }
+  }
+
+  async getFileContent(name: string): Promise<string> {
+    const fileName = this.getFileName(name);
+    return await fs.promises.readFile(fileName, 'utf8');
+  }
+
+  getFileName(name: string): string {
+    return path.join(this.tempDir, name);
   }
 
   getOutput(name: string): string {
@@ -113,6 +151,11 @@ export class ActionFixture {
     await commitChanges(this.tempDir, message);
   }
 
+  async diff(count: number = 1): Promise<string[]> {
+    const fileNames = await execGit(['diff', `HEAD~${count}`, 'HEAD', '--name-only'], this.tempDir);
+    return fileNames.split('\n').filter((p) => p.length > 0);
+  }
+
   async writeFile(name: string, content: string): Promise<void> {
     const filePath = path.join(this.tempDir, name);
     await fs.promises.writeFile(filePath, content);
@@ -122,7 +165,7 @@ export class ActionFixture {
     const inputs = {
       GITHUB_OUTPUT: this.outputPath,
       GITHUB_STEP_SUMMARY: this.githubStepSummary,
-      INPUT_BRANCH: this.branch,
+      INPUT_BRANCH: this.baseBranch,
       INPUT_REPOSITORY: this.tempDir,
       RUNNER_DEBUG: '1',
     };
@@ -130,5 +173,32 @@ export class ActionFixture {
     for (const key in inputs) {
       process.env[key] = inputs[key as keyof typeof inputs];
     }
+  }
+
+  private setupMocks(): void {
+    jest.spyOn(core, 'setFailed').mockImplementation(() => {});
+    this.setupLogging();
+  }
+
+  private setupLogging(): void {
+    const logger = (level: string, arg: string | Error) => {
+      console.debug(`[${level}] ${arg}`);
+    };
+
+    jest.spyOn(core, 'debug').mockImplementation((arg) => {
+      logger('debug', arg);
+    });
+    jest.spyOn(core, 'info').mockImplementation((arg) => {
+      logger('info', arg);
+    });
+    jest.spyOn(core, 'notice').mockImplementation((arg) => {
+      logger('notice', arg);
+    });
+    jest.spyOn(core, 'warning').mockImplementation((arg) => {
+      logger('warning', arg);
+    });
+    jest.spyOn(core, 'error').mockImplementation((arg) => {
+      logger('error', arg);
+    });
   }
 }

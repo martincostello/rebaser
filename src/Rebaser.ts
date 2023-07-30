@@ -10,18 +10,20 @@ import { SimpleGit, TaskOptions, simpleGit } from 'simple-git';
 
 import { tryResolveConflicts } from './Resolver';
 
-async function rebase(git: SimpleGit, options: TaskOptions): Promise<boolean> {
+async function rebase(git: SimpleGit, options: TaskOptions): Promise<RebaseResult> {
   try {
-    await git.rebase(options);
-    return true;
+    const result = await git.rebase(options);
+    core.debug(`Rebase result:\n${result}`);
+    return result?.includes('up to date') ? RebaseResult.upToDate : RebaseResult.success;
   } catch (error: any) {
-    core.debug(error);
-    return false;
+    core.debug(`Rebase failed:\n${error}`);
+    return RebaseResult.conflicts;
   }
 }
 
 async function getFilesWithConflicts(git: SimpleGit, repository: string): Promise<string[]> {
   const conflicts = await git.diff(['--name-only', '--diff-filter=U', '--relative']);
+  core.debug(`Files with conflicts:\n${conflicts}`);
   const paths = conflicts
     .split('\n')
     .filter((p) => p.length > 0)
@@ -31,37 +33,42 @@ async function getFilesWithConflicts(git: SimpleGit, repository: string): Promis
   return paths.reverse();
 }
 
-export async function tryRebase(options: { branch: string; repository: string }): Promise<boolean> {
-  core.debug(`Rebasing '${options.branch}' branch in '${options.repository}'.`);
+export async function tryRebase(options: { branch: string; repository: string; userEmail: string; userName: string }): Promise<boolean> {
+  core.debug(`Rebasing '${options.branch}' branch in '${options.repository}'`);
 
   const git = simpleGit({
     baseDir: options.repository,
-    config: ['core.editor=true'], // Do not open editor for commit messages
+    config: [
+      'core.editor=true', // Do not open editor for commit messages
+      `user.email=${options.userEmail}`,
+      `user.name=${options.userName}`,
+    ],
   });
 
-  let abort = false;
+  let result = RebaseResult.success;
   let rebaseOptions = [options.branch];
 
   try {
-    while (!(await rebase(git, rebaseOptions))) {
+    while ((result = await rebase(git, rebaseOptions)) === RebaseResult.conflicts) {
       const filesWithConflicts = await getFilesWithConflicts(git, options.repository);
 
       if (filesWithConflicts.length === 0) {
-        core.warning(`Failed to determine files with conflicts.`);
-        abort = true;
+        core.warning('Failed to determine files with conflicts.');
+        result = RebaseResult.error;
         break;
       }
 
+      let resolved = false;
+
       for (const file of filesWithConflicts) {
-        const resolved = await tryResolveConflicts(file);
+        resolved = await tryResolveConflicts(file);
         if (!resolved) {
           core.warning(`Failed to resolve conflicts in '${file}'.`);
-          abort = true;
           break;
         }
       }
 
-      if (abort) {
+      if (!resolved) {
         break;
       }
 
@@ -69,15 +76,38 @@ export async function tryRebase(options: { branch: string; repository: string })
       rebaseOptions = ['--continue'];
     }
   } finally {
-    if (abort) {
+    if (result === RebaseResult.conflicts) {
       await rebase(git, ['--abort']);
     }
   }
 
-  if (!abort) {
-    core.debug(`Rebased '${options.branch}' branch in '${options.repository}'.`);
-    return true;
+  core.debug(`Rebase result: ${result}`);
+
+  switch (result) {
+    case RebaseResult.conflicts:
+      core.warning(`${options.branch} could not be rebased due to conflicts that could not be automatically resolved.`);
+      break;
+
+    case RebaseResult.error:
+      core.error(`Failed to rebase ${options.branch} due to an error.`);
+      break;
+
+    case RebaseResult.success:
+      core.info(`${options.branch} was successfully rebased.`);
+      break;
+
+    case RebaseResult.upToDate:
+      core.info(`${options.branch} is already up to date.`);
+      break;
   }
 
-  return !abort;
+  return result === RebaseResult.success;
+}
+
+// eslint-disable-next-line no-shadow
+export enum RebaseResult {
+  upToDate = 0,
+  success = 1,
+  conflicts = 2,
+  error = 3,
 }
