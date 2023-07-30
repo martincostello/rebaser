@@ -49,6 +49,29 @@ export class ActionFixture {
     this.setupMocks();
   }
 
+  async setupRepositoryFromFixture(name: string): Promise<void> {
+    const fixturePath = path.join(__dirname, 'fixtures', name);
+
+    const applyContent = async (dir: string): Promise<void> => {
+      await io.cp(dir, this.tempDir, { recursive: true, force: true, copySourceDirectory: false });
+    };
+
+    await this.setupRepository(
+      async () => {
+        await applyContent(path.join(fixturePath, 'base'));
+        await this.commit('Apply base');
+      },
+      async () => {
+        await applyContent(path.join(fixturePath, 'target'));
+        await this.commit('Apply target');
+      },
+      async () => {
+        await applyContent(path.join(fixturePath, 'patch'));
+        await this.commit('Apply patch');
+      }
+    );
+  }
+
   async setupRepository(
     setupBase: (branch: string) => Promise<void>,
     setupTarget: (branch: string) => Promise<void>,
