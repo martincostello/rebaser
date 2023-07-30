@@ -219,7 +219,7 @@ describe('rebaser', () => {
     });
   });
 
-  describe('when branch is up-to-date', () => {
+  describe('when the conflicts cannot be resolved', () => {
     let fixture: ActionFixture;
 
     beforeAll(async () => {
