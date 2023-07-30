@@ -16,9 +16,9 @@ export async function run(): Promise<void> {
       userName: core.getInput('user-name', { required: false }) || 'github-actions[bot]',
     };
 
-    const rebased = await tryRebase(options);
+    const result = await tryRebase(options);
 
-    core.setOutput('rebased', rebased);
+    core.setOutput('result', result.toString());
   } catch (error: any) {
     core.error(error);
     if (error instanceof Error) {

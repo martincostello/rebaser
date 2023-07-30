@@ -36,8 +36,8 @@ describe('rebaser', () => {
       expect(core.setFailed).toHaveBeenCalledTimes(0);
     });
 
-    test('outputs that the branch was rebased', () => {
-      expect(fixture.getOutput('rebased')).toBe('true');
+    test('outputs the correct result', () => {
+      expect(fixture.getOutput('result')).toBe('success');
     });
 
     test('rebases the branch', async () => {
@@ -65,8 +65,8 @@ describe('rebaser', () => {
       expect(core.setFailed).toHaveBeenCalledTimes(0);
     });
 
-    test('outputs that the branch was rebased', () => {
-      expect(fixture.getOutput('rebased')).toBe('true');
+    test('outputs the correct result', () => {
+      expect(fixture.getOutput('result')).toBe('success');
     });
 
     test('rebases the branch', async () => {
@@ -94,8 +94,8 @@ describe('rebaser', () => {
       expect(core.setFailed).toHaveBeenCalledTimes(0);
     });
 
-    test('outputs that the branch was rebased', () => {
-      expect(fixture.getOutput('rebased')).toBe('true');
+    test('outputs the correct result', () => {
+      expect(fixture.getOutput('result')).toBe('success');
     });
 
     test('rebases the branch', async () => {
@@ -127,8 +127,8 @@ describe('rebaser', () => {
       expect(core.setFailed).toHaveBeenCalledTimes(0);
     });
 
-    test('outputs that the branch was rebased', () => {
-      expect(fixture.getOutput('rebased')).toBe('true');
+    test('outputs the correct result', () => {
+      expect(fixture.getOutput('result')).toBe('success');
     });
 
     test('rebases the branch', async () => {
@@ -163,8 +163,8 @@ describe('rebaser', () => {
       expect(core.setFailed).toHaveBeenCalledTimes(0);
     });
 
-    test('outputs that the branch was rebased', () => {
-      expect(fixture.getOutput('rebased')).toBe('true');
+    test('outputs the correct result', () => {
+      expect(fixture.getOutput('result')).toBe('success');
     });
 
     test('rebases the branch', async () => {
@@ -206,8 +206,8 @@ describe('rebaser', () => {
       expect(core.setFailed).toHaveBeenCalledTimes(0);
     });
 
-    test('outputs that the branch was not rebased', () => {
-      expect(fixture.getOutput('rebased')).toBe('false');
+    test('outputs the correct result', () => {
+      expect(fixture.getOutput('result')).toBe('upToDate');
     });
 
     test('the branch is still rebased from before', async () => {
@@ -219,7 +219,7 @@ describe('rebaser', () => {
     });
   });
 
-  describe('when branch is up-to-date', () => {
+  describe('when the conflicts cannot be resolved', () => {
     let fixture: ActionFixture;
 
     beforeAll(async () => {
@@ -235,8 +235,8 @@ describe('rebaser', () => {
       expect(core.setFailed).toHaveBeenCalledTimes(0);
     });
 
-    test('outputs that the branch was not rebased', () => {
-      expect(fixture.getOutput('rebased')).toBe('false');
+    test('outputs the correct result', () => {
+      expect(fixture.getOutput('result')).toBe('conflicts');
     });
 
     test('aborts the rebase', async () => {

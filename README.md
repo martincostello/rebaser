@@ -56,7 +56,7 @@ jobs:
         id: rebase
 
       - name: Push changes
-        if : ${{ steps.rebase.outputs.rebased == 'true' }}
+        if : ${{ steps.rebase.outputs.result == 'success' }}
         run: git push --force-with-lease origin ${{ inputs.branch }}
 ```
 
@@ -73,7 +73,7 @@ jobs:
 
 | **Name** | **Description** |
 |:--|:--|
-| `rebased` | Whether the branch was successfully rebased. |
+| `result` | The result of attempting to rebase the branch. The value is one of: `upToDate`, `success`, `conflicts` or `error`. |
 
 ## Feedback
 

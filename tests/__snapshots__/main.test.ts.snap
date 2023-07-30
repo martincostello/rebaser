@@ -64,15 +64,6 @@ exports[`rebaser when branch is up-to-date matches the snapshot 1`] = `
 "
 `;
 
-exports[`rebaser when branch is up-to-date matches the snapshot 2`] = `
-"<Project>
-  <ItemGroup>
-    <PackageVersion Include="System.Text.Json" Version="8.0.0-preview.6.23329.7" />
-  </ItemGroup>
-</Project>
-"
-`;
-
 exports[`rebaser when global.json has conflicts matches the snapshot 1`] = `
 "{
   "sdk": {
@@ -91,5 +82,14 @@ exports[`rebaser when package.json has conflicts matches the snapshot 1`] = `
     "@microsoft/signalr": "^8.0.0-preview.6.23329.11"
   }
 }
+"
+`;
+
+exports[`rebaser when the conflicts cannot be resolved matches the snapshot 1`] = `
+"<Project>
+  <ItemGroup>
+    <PackageVersion Include="System.Text.Json" Version="8.0.0-preview.6.23329.7" />
+  </ItemGroup>
+</Project>
 "
 `;
