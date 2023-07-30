@@ -31,28 +31,6 @@ export class ActionFixture {
   }
 
   async initialize(): Promise<void> {
-    jest.spyOn(core, 'setFailed').mockImplementation(() => {});
-
-    const logger = (level: string, arg: string | Error) => {
-      console.debug(`[${level}] ${arg}`);
-    };
-
-    jest.spyOn(core, 'debug').mockImplementation((arg) => {
-      logger('debug', arg);
-    });
-    jest.spyOn(core, 'info').mockImplementation((arg) => {
-      logger('info', arg);
-    });
-    jest.spyOn(core, 'notice').mockImplementation((arg) => {
-      logger('notice', arg);
-    });
-    jest.spyOn(core, 'warning').mockImplementation((arg) => {
-      logger('warning', arg);
-    });
-    jest.spyOn(core, 'error').mockImplementation((arg) => {
-      logger('error', arg);
-    });
-
     this.tempDir = await createTemporaryDirectory();
     this.githubStepSummary = path.join(this.tempDir, 'github-step-summary.md');
     this.outputPath = path.join(this.tempDir, 'github-outputs');
@@ -62,6 +40,7 @@ export class ActionFixture {
     await createGitRepo(this.tempDir);
 
     this.setupEnvironment();
+    this.setupMocks();
   }
 
   async run(): Promise<void> {
@@ -124,5 +103,32 @@ export class ActionFixture {
     for (const key in inputs) {
       process.env[key] = inputs[key as keyof typeof inputs];
     }
+  }
+
+  private setupMocks(): void {
+    jest.spyOn(core, 'setFailed').mockImplementation(() => {});
+    this.setupLogging();
+  }
+
+  private setupLogging(): void {
+    const logger = (level: string, arg: string | Error) => {
+      console.debug(`[${level}] ${arg}`);
+    };
+
+    jest.spyOn(core, 'debug').mockImplementation((arg) => {
+      logger('debug', arg);
+    });
+    jest.spyOn(core, 'info').mockImplementation((arg) => {
+      logger('info', arg);
+    });
+    jest.spyOn(core, 'notice').mockImplementation((arg) => {
+      logger('notice', arg);
+    });
+    jest.spyOn(core, 'warning').mockImplementation((arg) => {
+      logger('warning', arg);
+    });
+    jest.spyOn(core, 'error').mockImplementation((arg) => {
+      logger('error', arg);
+    });
   }
 }
