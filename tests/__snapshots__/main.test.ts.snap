@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`rebaser when Directory.Packages.props has conflicts running the action has the correct dependencies 1`] = `
+"
+<Project>
+<ItemGroup>
+    <PackageVersion Include=\\"System.Text.Json\\" Version=\\"8.0.0\\" />
+</ItemGroup>
+</Project>
+    "
+`;
