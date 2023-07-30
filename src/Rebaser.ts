@@ -53,7 +53,7 @@ export async function tryRebase(options: { branch: string; repository: string; u
       const filesWithConflicts = await getFilesWithConflicts(git, options.repository);
 
       if (filesWithConflicts.length === 0) {
-        core.warning(`Failed to determine files with conflicts.`);
+        core.warning('Failed to determine files with conflicts.');
         result = RebaseResult.error;
         break;
       }
@@ -85,19 +85,19 @@ export async function tryRebase(options: { branch: string; repository: string; u
 
   switch (result) {
     case RebaseResult.conflicts:
-      core.warning(`'${options.branch}' could not be rebased due to conflicts that could not be automatically resolved.`);
+      core.warning(`${options.branch} could not be rebased due to conflicts that could not be automatically resolved.`);
       break;
 
     case RebaseResult.error:
-      core.error(`Failed to rebase '${options.branch}' due to an error.`);
+      core.error(`Failed to rebase ${options.branch} due to an error.`);
       break;
 
     case RebaseResult.success:
-      core.info(`'${options.branch}' was successfully rebased.`);
+      core.info(`${options.branch} was successfully rebased.`);
       break;
 
     case RebaseResult.upToDate:
-      core.info(`'${options.branch}' is already up to date.`);
+      core.info(`${options.branch} is already up to date.`);
       break;
 
     default:

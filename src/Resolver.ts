@@ -74,10 +74,10 @@ async function tryResolvePackageConflicts(path: string): Promise<boolean> {
         if (theirVersion && ourVersion) {
           if (theirVersion.compareTo(ourVersion) > 0) {
             merged.push(theirLine);
-            core.debug(`Resolved conflict with their version '${theirVersion.toString()}'`);
+            core.debug(`Resolved conflict with their version: ${theirVersion.toString()}`);
           } else {
             merged.push(ourLine);
-            core.debug(`Resolved conflict with our version '${ourVersion.toString()}'`);
+            core.debug(`Resolved conflict with our version: ${ourVersion.toString()}`);
           }
           resolvedConflict = true;
         }
