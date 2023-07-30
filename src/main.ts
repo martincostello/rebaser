@@ -4,7 +4,7 @@
 import * as core from '@actions/core';
 
 import { Context } from '@actions/github/lib/context';
-import { tryRebase } from './Rebaser';
+import { RebaseResult, tryRebase } from './Rebaser';
 
 export async function run(): Promise<void> {
   try {
@@ -24,6 +24,7 @@ export async function run(): Promise<void> {
     if (error instanceof Error) {
       core.setFailed(error.message);
     }
+    core.setOutput('result', RebaseResult.error.toString());
   }
 }
 
