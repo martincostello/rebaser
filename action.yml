@@ -18,7 +18,7 @@ inputs:
     required: false
     default: 'github-actions[bot]@users.noreply.github.com'
   user-name:
-    description: 'The optional user name to use for the Git commit(s).'
+    description: 'The optional user name to use for Git commit(s).'
     required: false
     default: 'github-actions[bot]'
 outputs:
