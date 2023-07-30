@@ -48,7 +48,7 @@ describe('rebaser', () => {
       expect(await fixture.getFileContent('global.json')).toMatchInlineSnapshot(`
 "{
   "sdk": {
-    "version": "8.0.100"
+    "version": "8.0.100-preview.6.23330.14"
   }
 }
 "
@@ -84,7 +84,7 @@ describe('rebaser', () => {
       expect(await fixture.getFileContent('Directory.Packages.props')).toMatchInlineSnapshot(`
 "<Project>
   <ItemGroup>
-    <PackageVersion Include="System.Text.Json" Version="8.0.0" />
+    <PackageVersion Include="System.Text.Json" Version="8.0.0-preview.6.23329.7" />
   </ItemGroup>
 </Project>
 "
