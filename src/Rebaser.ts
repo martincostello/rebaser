@@ -10,14 +10,14 @@ import { SimpleGit, TaskOptions, simpleGit } from 'simple-git';
 
 import { tryResolveConflicts } from './Resolver';
 
-async function rebase(git: SimpleGit, options: TaskOptions): Promise<boolean> {
+async function rebase(git: SimpleGit, options: TaskOptions): Promise<RebaseResult> {
   try {
     const result = await git.rebase(options);
     core.debug(`Rebase result:\n${result}`);
-    return true;
+    return result?.includes('up to date') ? RebaseResult.upToDate : RebaseResult.success;
   } catch (error: any) {
-    core.debug(`Rebase error:\n${error}`);
-    return false;
+    core.debug(`Rebase failed:\n${error}`);
+    return RebaseResult.conflicts;
   }
 }
 
@@ -45,29 +45,30 @@ export async function tryRebase(options: { branch: string; repository: string; u
     ],
   });
 
-  let abort = false;
+  let result = RebaseResult.success;
   let rebaseOptions = [options.branch];
 
   try {
-    while (!(await rebase(git, rebaseOptions))) {
+    while ((result = await rebase(git, rebaseOptions)) === RebaseResult.conflicts) {
       const filesWithConflicts = await getFilesWithConflicts(git, options.repository);
 
       if (filesWithConflicts.length === 0) {
         core.warning(`Failed to determine files with conflicts.`);
-        abort = true;
+        result = RebaseResult.error;
         break;
       }
 
+      let resolved = false;
+
       for (const file of filesWithConflicts) {
-        const resolved = await tryResolveConflicts(file);
+        resolved = await tryResolveConflicts(file);
         if (!resolved) {
           core.warning(`Failed to resolve conflicts in '${file}'.`);
-          abort = true;
           break;
         }
       }
 
-      if (abort) {
+      if (!resolved) {
         break;
       }
 
@@ -75,15 +76,24 @@ export async function tryRebase(options: { branch: string; repository: string; u
       rebaseOptions = ['--continue'];
     }
   } finally {
-    if (abort) {
+    if (result === RebaseResult.conflicts) {
       await rebase(git, ['--abort']);
     }
   }
 
-  if (!abort) {
-    core.debug(`Rebased '${options.branch}' branch in '${options.repository}'.`);
-    return true;
+  core.debug(`Rebase result: ${result}`);
+
+  if (result === RebaseResult.success) {
+    core.info(`Rebased '${options.branch}' branch in '${options.repository}'.`);
   }
 
-  return !abort;
+  return result === RebaseResult.success;
+}
+
+// eslint-disable-next-line no-shadow
+export enum RebaseResult {
+  upToDate = 0,
+  success = 1,
+  conflicts = 2,
+  error = 3,
 }
