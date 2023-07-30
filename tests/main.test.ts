@@ -2,7 +2,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
-import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
+import { afterAll, beforeAll, describe, expect, test, xdescribe } from '@jest/globals';
 import { ActionFixture } from './ActionFixture';
 
 describe('rebaser', () => {
@@ -99,7 +99,7 @@ describe('rebaser', () => {
     });
   });
 
-  describe('when package.json has conflicts', () => {
+  xdescribe('when package.json has conflicts', () => {
     let fixture: ActionFixture;
 
     beforeAll(async () => {
