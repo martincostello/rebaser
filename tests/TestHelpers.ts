@@ -28,7 +28,7 @@ export async function createGitRepo(path: string): Promise<void> {
   await git('config', 'user.email', 'test@test.local');
   await git('config', 'user.name', 'test');
 
-  const ignores = ['.DS_Store', '.vscode', 'bin', 'obj', 'node_modules'];
+  const ignores = ['.DS_Store', '.vscode', 'bin', 'obj', 'node_modules', 'github-step-summary.md', 'github-outputs'];
   await fs.promises.writeFile(join(path, '.gitignore'), ignores.join('\n'));
   await fs.promises.writeFile(join(path, '.gitattributes'), '* text=auto eol=lf');
 
