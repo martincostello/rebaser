@@ -134,4 +134,40 @@ describe('rebaser', () => {
 `);
     });
   });
+
+  describe('when C# project file has conflicts', () => {
+    let fixture: ActionFixture;
+
+    beforeAll(async () => {
+      fixture = await runFixture('Project.csproj');
+    }, rebaseTimeout);
+
+    afterAll(async () => {
+      await fixture?.destroy();
+    });
+
+    test('generates no errors', () => {
+      expect(core.error).toHaveBeenCalledTimes(0);
+      expect(core.setFailed).toHaveBeenCalledTimes(0);
+    });
+
+    test('outputs that the branch was rebased', () => {
+      expect(fixture.getOutput('rebased')).toBe('true');
+    });
+
+    test('rebases the branch', async () => {
+      expect(await fixture.commitHistory(3)).toEqual(['Apply target', 'Apply patch', 'Apply base']);
+    });
+
+    test('matches the snapshot', async () => {
+      expect(await fixture.getFileContent('Project/Project.csproj')).toMatchInlineSnapshot(`
+"<Project>
+  <ItemGroup>
+    <PackageVersion Include="System.Text.Json" Version="8.0.0-preview.6.23329.7" />
+  </ItemGroup>
+</Project>
+"
+`);
+    });
+  });
 });
