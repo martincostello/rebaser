@@ -17,3 +17,16 @@ updates:
   reviewers:
     - "martincostello"
   open-pull-requests-limit: 99
+- package-ecosystem: "npm"
+  directory: "/"
+  groups:
+    dependencies:
+      patterns:
+        - "@typescript-eslint/*"
+  schedule:
+    interval: "daily"
+    time: "05:30"
+    timezone: Europe/London
+  reviewers:
+    - "martincostello"
+  open-pull-requests-limit: 99
