@@ -23,7 +23,6 @@ export class ActionFixture {
   private githubStepSummary: string = '';
   private outputPath: string = '';
   private outputs: Record<string, string> = {};
-  public logs: string[] = [];
 
   constructor(public branch: string = 'main') {}
 
@@ -32,11 +31,10 @@ export class ActionFixture {
   }
 
   async initialize(): Promise<void> {
-    jest.spyOn(process.stdout, 'write').mockImplementation(() => true);
     jest.spyOn(core, 'setFailed').mockImplementation(() => {});
 
-    const logger = (level, arg) => {
-      this.logs.push(`[${level}] ${arg}`);
+    const logger = (level: string, arg: string | Error) => {
+      console.debug(`[${level}] ${arg}`);
     };
 
     jest.spyOn(core, 'debug').mockImplementation((arg) => {
@@ -77,10 +75,6 @@ export class ActionFixture {
       const key = lines[index].split('<<')[0];
       const value = lines[index + 1];
       this.outputs[key] = value;
-    }
-
-    for (const message of this.logs) {
-      console.log(message);
     }
   }
 
