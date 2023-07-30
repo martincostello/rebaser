@@ -3,7 +3,8 @@ module.exports = {
   moduleFileExtensions: [ 'js', 'ts' ],
   prettierPath: null,
   reporters: [
-    ['github-actions', {silent: false}], 'summary'
+    'default',
+    'github-actions'
   ],
   testEnvironment: 'node',
   testMatch: [ '**/*.test.ts' ],
