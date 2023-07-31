@@ -136,14 +136,7 @@ describe('rebaser', () => {
     });
 
     test('matches the snapshot', async () => {
-      expect(await fixture.getFileContent('Project/Project.csproj')).toMatchInlineSnapshot(`
-"<Project>
-  <ItemGroup>
-    <PackageVersion Include="System.Text.Json" Version="8.0.0-preview.6.23329.7" />
-  </ItemGroup>
-</Project>
-"
-`);
+      expect(await fixture.getFileContent('Project/Project.csproj')).toMatchSnapshot();
     });
   });
 
@@ -172,14 +165,7 @@ describe('rebaser', () => {
     });
 
     test('SDK matches the snapshot', async () => {
-      expect(await fixture.getFileContent('global.json')).toMatchInlineSnapshot(`
-"{
-  "sdk": {
-    "version": "8.0.100-preview.6.23330.14"
-  }
-}
-"
-`);
+      expect(await fixture.getFileContent('global.json')).toMatchSnapshot();
     });
 
     test('packages matches the snapshot', async () => {
