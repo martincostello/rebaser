@@ -8,6 +8,7 @@ import { RebaseResult, tryRebase } from './Rebaser';
 
 export async function run(): Promise<void> {
   try {
+    // This is a comment
     const context = new Context();
     const options = {
       branch: core.getInput('branch', { required: false }) || context.payload.repository?.['default_branch'] || 'main',
