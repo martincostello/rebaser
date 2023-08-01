@@ -6,11 +6,11 @@ const versionMarker = '.';
 
 export class NuGetVersion {
   constructor(
-    public major: number = -1,
-    public minor: number = -1,
-    public patch: number = -1,
-    public build: number = -1,
-    public prerelease: string = ''
+    public major = -1,
+    public minor = -1,
+    public patch = -1,
+    public build = -1,
+    public prerelease = ''
   ) {}
 
   public static tryParse(value: string): NuGetVersion | null {
