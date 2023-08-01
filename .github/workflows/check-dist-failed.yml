@@ -29,7 +29,7 @@ jobs:
               repo: context.repo.repo,
               commit_sha: context.payload.workflow_run.head_sha,
             });
-            if (prs.data.length > 0) {
+            if (prs.length > 0) {
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
