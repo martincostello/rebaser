@@ -64,7 +64,7 @@ jobs:
             exit 1
           fi
 
-      - name: Upload dist generated dist
+      - name: Upload generated dist
         uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         if: ${{ failure() && steps.diff.conclusion == 'failure' }}
         with:
