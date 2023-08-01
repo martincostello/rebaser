@@ -47,9 +47,7 @@ jobs:
             restore-keys: ${{ runner.os }}-node-
 
       - name: Install packages
-        run: |
-          npm install --global @vercel/ncc
-          npm ci
+        run: npm ci
 
       - name: Rebuild the dist directory
         run: npm run check-dist
