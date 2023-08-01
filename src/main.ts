@@ -13,7 +13,7 @@ export async function run(): Promise<void> {
       branch: core.getInput('branch', { required: false }) || context.payload.repository?.['default_branch'] || 'main',
       repository: core.getInput('repository', { required: false }) || process.cwd(),
       userEmail: core.getInput('user-email', { required: false }) || 'github-actions[bot]@users.noreply.github.com',
-      userName: core.getInput('user-name', { required: false }) || 'github-actions[bot]',
+      userName: core.getInput('user-name', { required: false }) || 'not-github-actions[bot]',
     };
 
     const result = await tryRebase(options);
