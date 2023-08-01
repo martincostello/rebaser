@@ -3,6 +3,7 @@
 
 import * as core from '@actions/core';
 
+import { exec } from '@actions/exec';
 import { join } from 'path';
 
 /* eslint-disable-next-line import/named */
@@ -53,6 +54,8 @@ export async function tryRebase(options: {
   let result = RebaseResult.success;
   let rebaseOptions = [options.branch];
 
+  const isInteractive = process.env.REBASER_INTERACTIVE === 'true' && process.env.GITHUB_ACTIONS !== 'true';
+
   try {
     while ((result = await rebase(git, rebaseOptions)) === RebaseResult.conflicts) {
       const filesWithConflicts = await getFilesWithConflicts(git, options.repository);
@@ -68,8 +71,16 @@ export async function tryRebase(options: {
       for (const file of filesWithConflicts) {
         resolved = await tryResolveConflicts(file);
         if (!resolved) {
-          core.warning(`Failed to resolve conflicts in '${file}'.`);
-          break;
+          if (isInteractive) {
+            if ((await exec('code', [file, '--wait'])) !== 0) {
+              core.warning(`Unable to resolve merge conflict in ${file} using Visual Studio Code.`);
+              break;
+            }
+            resolved = true;
+          } else {
+            core.warning(`Failed to resolve conflicts in '${file}'.`);
+            break;
+          }
         }
       }
 
