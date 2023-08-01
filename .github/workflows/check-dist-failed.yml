@@ -34,6 +34,6 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: prs[0].number,
-                body: `Hi @${prs[0].user.login} :wave:\n\nIt looks like this pull request makes changes which require the contents of the \`dist\` to be updated, but these have not been included with your changes.\n\nPlease run \`build.ps1\` and commit the changes made to the \`dist\` directory to your branch and push them to this pull request.`,
+                body: `Hi @${prs[0].user.login} :wave:\n\nIt looks like this pull request makes changes which require the contents of \`dist\` to be updated, but these files have not been included with your changes.\n\nPlease run \`build.ps1\` and commit the changes made to the \`dist\` directory to your branch and push them to this pull request.`,
               });
             }
