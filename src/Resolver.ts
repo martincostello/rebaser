@@ -156,6 +156,8 @@ async function tryResolvePackageConflicts(path: string): Promise<boolean> {
         if (resolution) {
           merged.push(resolution);
           resolvedConflict = true;
+        } else if (theirs[j] !== ours[j]) {
+          return false;
         }
       }
     } else {

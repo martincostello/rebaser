@@ -1,5 +1,6 @@
 <Project>
   <ItemGroup>
+    <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="8.0.0-preview.6.23360.2" />
     <PackageVersion Include="System.Text.Json" Version="8.0.0-preview.6.23329.7" />
   </ItemGroup>
 </Project>

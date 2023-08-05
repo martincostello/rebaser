@@ -172,6 +172,7 @@ exports[`rebaser when package.json has conflicts matches the snapshot 1`] = `
 exports[`rebaser when the conflicts cannot be resolved matches the snapshot 1`] = `
 "<Project>
   <ItemGroup>
+    <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="8.0.0-preview.6.23360.2" />
     <PackageVersion Include="System.Text.Json" Version="8.0.0-preview.6.23329.7" />
   </ItemGroup>
 </Project>
