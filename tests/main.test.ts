@@ -173,6 +173,93 @@ describe('rebaser', () => {
     });
   });
 
+  describe('when a the number of lines in the diff is uneven', () => {
+    let fixture: ActionFixture;
+
+    beforeAll(async () => {
+      fixture = await runFixture('Uneven');
+    }, rebaseTimeout);
+
+    afterAll(async () => {
+      await fixture?.destroy();
+    });
+
+    test('generates no errors', () => {
+      expect(core.error).toHaveBeenCalledTimes(0);
+      expect(core.setFailed).toHaveBeenCalledTimes(0);
+    });
+
+    test('outputs the correct result', () => {
+      expect(fixture.getOutput('result')).toBe('success');
+    });
+
+    test('rebases the branch', async () => {
+      expect(await fixture.commitHistory(3)).toEqual(['Apply target', 'Apply patch', 'Apply base']);
+    });
+
+    test('packages matches the snapshot', async () => {
+      expect(await fixture.getFileContent('Directory.Packages.props')).toMatchSnapshot();
+    });
+  });
+
+  describe('when a line is added', () => {
+    let fixture: ActionFixture;
+
+    beforeAll(async () => {
+      fixture = await runFixture('AddedLine');
+    }, rebaseTimeout);
+
+    afterAll(async () => {
+      await fixture?.destroy();
+    });
+
+    test('generates no errors', () => {
+      expect(core.error).toHaveBeenCalledTimes(0);
+      expect(core.setFailed).toHaveBeenCalledTimes(0);
+    });
+
+    test('outputs the correct result', () => {
+      expect(fixture.getOutput('result')).toBe('success');
+    });
+
+    test('rebases the branch', async () => {
+      expect(await fixture.commitHistory(3)).toEqual(['Apply target', 'Apply patch', 'Apply base']);
+    });
+
+    test('packages matches the snapshot', async () => {
+      expect(await fixture.getFileContent('Directory.Packages.props')).toMatchSnapshot();
+    });
+  });
+
+  describe('when a line is deleted', () => {
+    let fixture: ActionFixture;
+
+    beforeAll(async () => {
+      fixture = await runFixture('DeletedLine');
+    }, rebaseTimeout);
+
+    afterAll(async () => {
+      await fixture?.destroy();
+    });
+
+    test('generates no errors', () => {
+      expect(core.error).toHaveBeenCalledTimes(0);
+      expect(core.setFailed).toHaveBeenCalledTimes(0);
+    });
+
+    test('outputs the correct result', () => {
+      expect(fixture.getOutput('result')).toBe('success');
+    });
+
+    test('rebases the branch', async () => {
+      expect(await fixture.commitHistory(3)).toEqual(['Apply target', 'Apply patch', 'Apply base']);
+    });
+
+    test('packages matches the snapshot', async () => {
+      expect(await fixture.getFileContent('Directory.Packages.props')).toMatchSnapshot();
+    });
+  });
+
   describe('when branch is up-to-date', () => {
     let fixture: ActionFixture;
 

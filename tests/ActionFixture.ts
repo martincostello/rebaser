@@ -21,29 +21,40 @@ import { run } from '../src/main';
 export class ActionFixture {
   public baseBranch: string;
   public targetBranch: string;
+  private repository: string = '';
   private tempDir: string = '';
   private githubStepSummary: string = '';
   private outputPath: string = '';
   private outputs: Record<string, string> = {};
 
-  constructor() {
+  constructor(baseBranch = '', targetBranch = '') {
     const randomString = () => Math.random().toString(36).substring(7);
-    this.baseBranch = `base-${randomString()}`;
-    this.targetBranch = `target-${randomString()}`;
+    this.baseBranch = baseBranch || `base-${randomString()}`;
+    this.targetBranch = targetBranch || `target-${randomString()}`;
   }
 
   get path(): string {
-    return this.tempDir;
+    return this.repository;
   }
 
-  async initialize(): Promise<void> {
+  async initialize(repository = ''): Promise<void> {
     this.tempDir = await createTemporaryDirectory();
+
+    if (repository) {
+      this.repository = repository;
+    } else {
+      this.repository = this.tempDir;
+    }
+
     this.githubStepSummary = path.join(this.tempDir, 'github-step-summary.md');
     this.outputPath = path.join(this.tempDir, 'github-outputs');
 
     await createEmptyFile(this.githubStepSummary);
     await createEmptyFile(this.outputPath);
-    await createGitRepo(this.tempDir);
+
+    if (!repository) {
+      await createGitRepo(this.tempDir);
+    }
 
     this.setupEnvironment();
     this.setupMocks();
@@ -127,7 +138,7 @@ export class ActionFixture {
   }
 
   getFileName(name: string): string {
-    return path.join(this.tempDir, name);
+    return path.join(this.repository, name);
   }
 
   getOutput(name: string): string {
@@ -166,7 +177,7 @@ export class ActionFixture {
       GITHUB_OUTPUT: this.outputPath,
       GITHUB_STEP_SUMMARY: this.githubStepSummary,
       INPUT_BRANCH: this.baseBranch,
-      INPUT_REPOSITORY: this.tempDir,
+      INPUT_REPOSITORY: this.repository,
       RUNNER_DEBUG: '1',
     };
 
