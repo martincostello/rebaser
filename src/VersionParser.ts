@@ -47,13 +47,13 @@ function tryParseVersionFromXml(value: string): Dependency | null {
   try {
     const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '@' });
     const fragment = parser.parse(value);
-    const name = (fragment?.PackageVersion || fragment?.PackageReference)?.['@Include'];
-    const version = (fragment?.PackageVersion || fragment?.PackageReference)?.['@Version'];
+    const element = fragment?.PackageVersion || fragment?.PackageReference;
+    const version = element?.['@Version'];
     if (version) {
       const packageVersion = NuGetVersion.tryParse(version);
       if (packageVersion) {
         return {
-          name,
+          name: element?.['@Include'],
           version: packageVersion,
         };
       }
