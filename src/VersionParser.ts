@@ -4,7 +4,7 @@
 import { XMLParser } from 'fast-xml-parser';
 import { NuGetVersion } from './NuGetVersion';
 
-function tryParseVersionFromJson(value: string): NuGetVersion | null {
+function tryParseVersionFromJson(value: string): Dependency | null {
   if (value.startsWith('<')) {
     return null;
   }
@@ -29,7 +29,10 @@ function tryParseVersionFromJson(value: string): NuGetVersion | null {
         }
         const version = NuGetVersion.tryParse(versionString);
         if (version) {
-          return version;
+          return {
+            name: key,
+            version,
+          };
         }
       }
     }
@@ -40,13 +43,20 @@ function tryParseVersionFromJson(value: string): NuGetVersion | null {
   return null;
 }
 
-function tryParseVersionFromXml(value: string): NuGetVersion | null {
+function tryParseVersionFromXml(value: string): Dependency | null {
   try {
     const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '@' });
     const fragment = parser.parse(value);
+    const name = (fragment?.PackageVersion || fragment?.PackageReference)?.['@Include'];
     const version = (fragment?.PackageVersion || fragment?.PackageReference)?.['@Version'];
     if (version) {
-      return NuGetVersion.tryParse(version);
+      const packageVersion = NuGetVersion.tryParse(version);
+      if (packageVersion) {
+        return {
+          name,
+          version: packageVersion,
+        };
+      }
     }
   } catch (error: any) {
     // Not a valid XML fragment
@@ -55,7 +65,7 @@ function tryParseVersionFromXml(value: string): NuGetVersion | null {
   return null;
 }
 
-export function tryParseVersion(value: string): NuGetVersion | null {
+export function tryParseVersion(value: string): Dependency | null {
   let version = tryParseVersionFromXml(value);
   if (!version) {
     version = tryParseVersionFromJson(value);
@@ -63,3 +73,8 @@ export function tryParseVersion(value: string): NuGetVersion | null {
 
   return version;
 }
+
+export type Dependency = {
+  name: string;
+  version: NuGetVersion;
+};

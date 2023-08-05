@@ -5,7 +5,7 @@ import * as core from '@actions/core';
 import * as fs from 'fs';
 import { basename, dirname } from 'path';
 
-import { tryParseVersion } from './VersionParser';
+import { Dependency, tryParseVersion } from './VersionParser';
 import { exec } from '@actions/exec';
 
 async function tryResolveNpmLockFileConflicts(path: string): Promise<boolean> {
@@ -31,6 +31,92 @@ const markers = {
   midpoint: '=======',
   ours: '>>>>>>>',
 };
+
+function tryResolveByLine(theirLine: string, ourLine: string): string | null {
+  const theirs = tryParseVersion(theirLine);
+  const ours = tryParseVersion(ourLine);
+
+  if (theirs && ours && theirs.name === ours.name) {
+    if (theirs.version.compareTo(ours.version) > 0) {
+      core.debug(`Resolved conflict for ${theirs.name} with their version: ${theirs.version.toString()}`);
+      return theirLine;
+    } else {
+      core.debug(`Resolved conflict for ${ours.name} with our version: ${ours.version.toString()}`);
+      return ourLine;
+    }
+  }
+
+  return null;
+}
+
+type Line = {
+  dependency: Dependency | null;
+  index: number;
+  value: string;
+};
+
+type Chunk = {
+  lines: Line[];
+  dependencies: Record<string, Dependency>;
+};
+
+function parseChunk(chunk: string[]): Chunk {
+  const result: Chunk = {
+    lines: [],
+    dependencies: {},
+  };
+
+  for (let i = 0; i < chunk.length; i++) {
+    const value = chunk[i];
+    const line = {
+      dependency: tryParseVersion(value),
+      index: i,
+      value,
+    };
+    if (line.dependency) {
+      result.dependencies[line.dependency.name] = line.dependency;
+    }
+    result.lines.push(line);
+  }
+
+  return result;
+}
+
+function tryResolveByChunk(theirs: string[], ours: string[]): string[] | null {
+  const theirChunk = parseChunk(theirs);
+  const ourChunk = parseChunk(ours);
+
+  const result: string[] = [];
+
+  for (const line of ourChunk.lines) {
+    const ourDependency = line.dependency;
+    let resolved = false;
+    if (ourDependency) {
+      const theirDependency = theirChunk.dependencies[ourDependency.name];
+      if (theirDependency) {
+        if (ourDependency && theirDependency && ourDependency.name === theirDependency.name) {
+          if (theirDependency.version.compareTo(ourDependency.version) > 0) {
+            core.debug(`Resolved conflict for ${theirDependency.name} with their version: ${theirDependency.version.toString()}`);
+            result.push(theirs[line.index]);
+          } else {
+            core.debug(`Resolved conflict for ${ourDependency.name} with our version: ${ourDependency.version.toString()}`);
+            result.push(line.value);
+          }
+          resolved = true;
+        }
+      }
+    } else {
+      result.push(line.value);
+      resolved = true;
+    }
+
+    if (!resolved) {
+      return null;
+    }
+  }
+
+  return result;
+}
 
 async function tryResolvePackageConflicts(path: string): Promise<boolean> {
   const contents = await fs.promises.readFile(path, { encoding });
@@ -59,22 +145,17 @@ async function tryResolvePackageConflicts(path: string): Promise<boolean> {
 
     if (theirs.length === ours.length) {
       for (let j = 0; j < theirs.length; j++) {
-        const theirLine = theirs[j];
-        const ourLine = ours[j];
-
-        const theirVersion = tryParseVersion(theirLine);
-        const ourVersion = tryParseVersion(ourLine);
-
-        if (theirVersion && ourVersion) {
-          if (theirVersion.compareTo(ourVersion) > 0) {
-            merged.push(theirLine);
-            core.debug(`Resolved conflict with their version: ${theirVersion.toString()}`);
-          } else {
-            merged.push(ourLine);
-            core.debug(`Resolved conflict with our version: ${ourVersion.toString()}`);
-          }
+        const resolution = tryResolveByLine(theirs[j], ours[j]);
+        if (resolution) {
+          merged.push(resolution);
           resolvedConflict = true;
         }
+      }
+    } else {
+      const resolution = tryResolveByChunk(theirs, ours);
+      if (resolution) {
+        merged.push(...resolution);
+        resolvedConflict = true;
       }
     }
 
