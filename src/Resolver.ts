@@ -152,11 +152,13 @@ async function tryResolvePackageConflicts(path: string): Promise<boolean> {
 
     if (theirs.length === ours.length) {
       for (let j = 0; j < theirs.length; j++) {
-        const resolution = tryResolveByLine(theirs[j], ours[j]);
+        const theirLine = theirs[j];
+        const ourLine = ours[j];
+        const resolution = tryResolveByLine(theirLine, ourLine);
         if (resolution) {
           merged.push(resolution);
           resolvedConflict = true;
-        } else if (theirs[j] !== ours[j]) {
+        } else if (theirLine !== ourLine) {
           return false;
         }
       }
