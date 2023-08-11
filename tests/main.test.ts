@@ -78,6 +78,35 @@ describe('rebaser', () => {
     });
   });
 
+  describe('when Directory.Packages.props has conflicts from an MSBuild property', () => {
+    let fixture: ActionFixture;
+
+    beforeAll(async () => {
+      fixture = await runFixture('MSBuildProperty');
+    }, rebaseTimeout);
+
+    afterAll(async () => {
+      await fixture?.destroy();
+    });
+
+    test('generates no errors', () => {
+      expect(core.error).toHaveBeenCalledTimes(0);
+      expect(core.setFailed).toHaveBeenCalledTimes(0);
+    });
+
+    test('outputs the correct result', () => {
+      expect(fixture.getOutput('result')).toBe('success');
+    });
+
+    test('rebases the branch', async () => {
+      expect(await fixture.commitHistory(3)).toEqual(['Apply target', 'Apply patch', 'Apply base']);
+    });
+
+    test('matches the snapshot', async () => {
+      expect(await fixture.getFileContent('Directory.Packages.props')).toMatchSnapshot();
+    });
+  });
+
   describe('when package.json has conflicts', () => {
     let fixture: ActionFixture;
 
