@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <DotNetVersion>7.0.2</DotNetVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="System.Text.Json" Version="$(DotNetVersion)" />
+  </ItemGroup>
+</Project>

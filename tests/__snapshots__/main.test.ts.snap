@@ -9,6 +9,18 @@ exports[`rebaser when C# project file has conflicts matches the snapshot 1`] = `
 "
 `;
 
+exports[`rebaser when Directory.Packages.props has conflicts from an MSBuild property matches the snapshot 1`] = `
+"<Project>
+  <PropertyGroup>
+    <DotNetVersion>8.0.0-preview.6.23329.7</DotNetVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="System.Text.Json" Version="$(DotNetVersion)" />
+  </ItemGroup>
+</Project>
+"
+`;
+
 exports[`rebaser when Directory.Packages.props has conflicts matches the snapshot 1`] = `
 "<Project>
   <ItemGroup>
