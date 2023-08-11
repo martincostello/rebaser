@@ -56,7 +56,7 @@ function tryParseVersionFromXml(value: string): Dependency | null {
       const keys = Object.keys(fragment);
       if (keys.length === 1) {
         name = keys[0];
-        version = fragment[keys[0]];
+        version = fragment[name];
       }
     }
     if (version) {
