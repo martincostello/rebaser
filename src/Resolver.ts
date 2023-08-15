@@ -112,7 +112,7 @@ function tryResolveByChunk(theirs: string[], ours: string[]): string[] | null {
         result.push(line.value);
         resolved = true;
       }
-    } else if (line.value === theirChunk.lines[line.index].value) {
+    } else if (line.value === theirChunk.lines[line.index]?.value) {
       result.push(line.value);
       resolved = true;
     }
