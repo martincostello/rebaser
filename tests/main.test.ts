@@ -2,7 +2,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
-import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
+import { afterAll, beforeAll, describe, expect, test, xdescribe } from '@jest/globals';
 import { ActionFixture } from './ActionFixture';
 
 describe('rebaser', () => {
@@ -349,4 +349,30 @@ describe('rebaser', () => {
       expect(await fixture.getFileContent('Directory.Packages.props')).toMatchSnapshot();
     });
   });
+
+  xdescribe.each([['', '', '']])(
+    'when an existing repository is rebased',
+    (repository: string, baseBranch: string, targetBranch: string) => {
+      let fixture: ActionFixture;
+
+      beforeAll(async () => {
+        fixture = new ActionFixture(baseBranch, targetBranch);
+        await fixture.initialize(repository);
+        await fixture.run();
+      }, rebaseTimeout);
+
+      afterAll(async () => {
+        await fixture?.destroy();
+      });
+
+      test('generates no errors', () => {
+        expect(core.error).toHaveBeenCalledTimes(0);
+        expect(core.setFailed).toHaveBeenCalledTimes(0);
+      });
+
+      test('outputs the correct result', () => {
+        expect(fixture.getOutput('result')).toBe('success');
+      });
+    }
+  );
 });
