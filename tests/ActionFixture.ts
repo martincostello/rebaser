@@ -19,11 +19,11 @@ import {
 import { run } from '../src/main';
 
 export class ActionFixture {
+  public stepSummary: string = '';
   public baseBranch: string;
   public targetBranch: string;
   private repository: string = '';
   private tempDir: string = '';
-  private githubStepSummary: string = '';
   private outputPath: string = '';
   private outputs: Record<string, string> = {};
 
@@ -46,10 +46,7 @@ export class ActionFixture {
       this.repository = this.tempDir;
     }
 
-    this.githubStepSummary = path.join(this.tempDir, 'github-step-summary.md');
     this.outputPath = path.join(this.tempDir, 'github-outputs');
-
-    await createEmptyFile(this.githubStepSummary);
     await createEmptyFile(this.outputPath);
 
     if (!repository) {
@@ -107,8 +104,7 @@ export class ActionFixture {
   async run(): Promise<void> {
     await run();
 
-    const buffer = await fs.promises.readFile(this.outputPath);
-    const content = buffer.toString();
+    const content = await fs.promises.readFile(this.outputPath, 'utf8');
 
     const lines = content.split(os.EOL);
     for (let index = 0; index < lines.length; index += 3) {
@@ -119,7 +115,7 @@ export class ActionFixture {
   }
 
   async reset(): Promise<void> {
-    await createEmptyFile(this.githubStepSummary);
+    this.stepSummary = '';
     await createEmptyFile(this.outputPath);
     this.outputs = {};
   }
@@ -175,7 +171,6 @@ export class ActionFixture {
   private setupEnvironment(): void {
     const inputs = {
       GITHUB_OUTPUT: this.outputPath,
-      GITHUB_STEP_SUMMARY: this.githubStepSummary,
       INPUT_BRANCH: this.baseBranch,
       INPUT_REPOSITORY: this.repository,
       RUNNER_DEBUG: '1',
@@ -211,5 +206,11 @@ export class ActionFixture {
     jest.spyOn(core, 'error').mockImplementation((arg) => {
       logger('error', arg);
     });
+
+    jest.spyOn(core.summary, 'addRaw').mockImplementation((text: string) => {
+      this.stepSummary += text;
+      return core.summary;
+    });
+    jest.spyOn(core.summary, 'write').mockReturnThis();
   }
 }
