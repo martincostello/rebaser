@@ -142,6 +142,11 @@
       "node": true
     }
   },
+  "eslintIgnore": [
+    "dist/",
+    "lib/",
+    "node_modules/"
+  ],
   "prettier": {
     "arrowParens": "always",
     "bracketSpacing": true,
