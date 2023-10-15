@@ -71,7 +71,7 @@ describe('NuGetVersion', () => {
     });
     test('invalid version numbers', () => {
       fc.assert(
-        fc.property(fc.int16Array({ max: 0 }), fc.string(), (parts, prerelease) => {
+        fc.property(fc.int16Array({ max: -1 }), fc.string(), (parts, prerelease) => {
           let value = parts.join('.');
           if (prerelease) {
             value += `-${prerelease}`;
@@ -81,7 +81,7 @@ describe('NuGetVersion', () => {
         })
       );
       fc.assert(
-        fc.property(fc.array(fc.string()), fc.string(), (parts, prerelease) => {
+        fc.property(fc.array(fc.string()).filter((t) => !t.some((s) => Number.parseInt(s, 10) > -1)), fc.string(), (parts, prerelease) => {
           let value = parts.join('.');
           if (prerelease) {
             value += `-${prerelease}`;
