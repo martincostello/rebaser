@@ -81,14 +81,18 @@ describe('NuGetVersion', () => {
         })
       );
       fc.assert(
-        fc.property(fc.array(fc.string()).filter((t) => !t.some((s) => Number.parseInt(s, 10) > -1)), fc.string(), (parts, prerelease) => {
-          let value = parts.join('.');
-          if (prerelease) {
-            value += `-${prerelease}`;
+        fc.property(
+          fc.array(fc.string()).filter((array) => !array.some((value) => Number.parseInt(value, 10) > -1)),
+          fc.string(),
+          (parts, prerelease) => {
+            let value = parts.join('.');
+            if (prerelease) {
+              value += `-${prerelease}`;
+            }
+            const actual = NuGetVersion.tryParse(value);
+            expect(actual).toBeNull();
           }
-          const actual = NuGetVersion.tryParse(value);
-          expect(actual).toBeNull();
-        })
+        )
       );
     });
     test('does not throw', () => {
