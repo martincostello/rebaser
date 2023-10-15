@@ -91,6 +91,17 @@ describe('NuGetVersion', () => {
         })
       );
     });
+    test('does not throw', () => {
+      fc.assert(
+        fc.property(fc.array(fc.string()), fc.string(), (parts, prerelease) => {
+          let value = parts.join('.');
+          if (prerelease) {
+            value += `-${prerelease}`;
+          }
+          expect(() => NuGetVersion.tryParse(value)).not.toThrow();
+        })
+      );
+    });
   });
   describe('correctly compares', () => {
     test.each([
