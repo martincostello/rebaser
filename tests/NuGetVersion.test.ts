@@ -1,6 +1,7 @@
 // Copyright (c) Martin Costello, 2023. All rights reserved.
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
+import * as fc from 'fast-check';
 import { beforeAll, describe, expect, test } from '@jest/globals';
 import { NuGetVersion } from '../src/NuGetVersion';
 
@@ -50,6 +51,61 @@ describe('NuGetVersion', () => {
         expect(actual).toBeNull();
       }
     );
+    test('valid version numbers', () => {
+      fc.assert(
+        fc.property(fc.uint16Array({ min: 0, minLength: 1, maxLength: 4 }), fc.string(), (parts, prerelease) => {
+          let value = parts.join('.');
+          if (prerelease) {
+            value += `-${prerelease}`;
+          }
+          const actual = NuGetVersion.tryParse(value);
+          expect(actual).not.toBeUndefined();
+          expect(actual).not.toBeNull();
+          expect(actual?.major).toBe(parts[0]);
+          expect(actual?.minor).toBe(parts.length > 1 ? parts[1] : -1);
+          expect(actual?.patch).toBe(parts.length > 2 ? parts[2] : -1);
+          expect(actual?.build).toBe(parts.length > 3 ? parts[3] : -1);
+          expect(actual?.prerelease).toBe(prerelease);
+        })
+      );
+    });
+    test('invalid version numbers', () => {
+      fc.assert(
+        fc.property(fc.int16Array({ max: -1 }), fc.string(), (parts, prerelease) => {
+          let value = parts.join('.');
+          if (prerelease) {
+            value += `-${prerelease}`;
+          }
+          const actual = NuGetVersion.tryParse(value);
+          expect(actual).toBeNull();
+        })
+      );
+      fc.assert(
+        fc.property(
+          fc.array(fc.string()).filter((array) => !array.some((value) => Number.parseInt(value, 10) > -1)),
+          fc.string(),
+          (parts, prerelease) => {
+            let value = parts.join('.');
+            if (prerelease) {
+              value += `-${prerelease}`;
+            }
+            const actual = NuGetVersion.tryParse(value);
+            expect(actual).toBeNull();
+          }
+        )
+      );
+    });
+    test('does not throw', () => {
+      fc.assert(
+        fc.property(fc.array(fc.string()), fc.string(), (parts, prerelease) => {
+          let value = parts.join('.');
+          if (prerelease) {
+            value += `-${prerelease}`;
+          }
+          expect(() => NuGetVersion.tryParse(value)).not.toThrow();
+        })
+      );
+    });
   });
   describe('correctly compares', () => {
     test.each([
