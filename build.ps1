@@ -7,3 +7,4 @@ npm run all
 if ($LASTEXITCODE -ne 0) {
     throw "build failed"
 }
+
