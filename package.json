@@ -10,9 +10,10 @@
     "format": "prettier --write src/**/*.ts tests/**/*.ts",
     "format-check": "prettier --check src/**/*.ts tests/**/*.ts",
     "lint": "eslint src/**/*.ts",
-    "package": "ncc build --minify --source-map --license licenses.txt",
+    "package": "esbuild lib/**.js --bundle --minify --outdir=dist --platform=node --sourcemap --target=node20.0.0",
     "test": "jest",
-    "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
+    "publish": "npm run build && npm run format && npm run lint && npm run package",
+    "all": "npm run publish && npm test"
   },
   "repository": {
     "type": "git",
@@ -62,7 +63,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "@typescript-eslint/parser": "^7.5.0",
-    "@vercel/ncc": "^0.38.1",
+    "esbuild": "^0.20.2",
     "eslint": "^8.57.0",
     "eslint-plugin-github": "^4.10.2",
     "eslint-plugin-jest": "^27.9.0",
