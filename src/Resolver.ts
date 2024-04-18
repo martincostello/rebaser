@@ -94,7 +94,7 @@ function tryResolveByChunk(theirs: string[], ours: string[]): string[] | null {
     if (ourDependency) {
       const theirDependency = theirChunk.dependencies[ourDependency.name];
       if (theirDependency) {
-        if (ourDependency && theirDependency && ourDependency.name === theirDependency.name) {
+        if (ourDependency.name === theirDependency.name) {
           if (theirDependency.version.compareTo(ourDependency.version) > 0) {
             core.debug(`Resolved conflict for ${theirDependency.name} with their version: ${theirDependency.version.toString()}`);
             const theirLine = theirChunk.lines.find((p) => p.dependency?.name === theirDependency.name)?.value;
