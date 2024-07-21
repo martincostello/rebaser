@@ -10,3 +10,6 @@ trim_trailing_whitespace = true
 
 [*.{js,json,ts}]
 indent_size = 2
+
+[*.ts]
+file_header_template = Copyright (c) Martin Costello, 2023. All rights reserved.\nLicensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
