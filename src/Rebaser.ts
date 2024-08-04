@@ -120,7 +120,6 @@ export async function tryRebase(options: {
   return result;
 }
 
-// eslint-disable-next-line no-shadow
 export enum RebaseResult {
   upToDate = 'upToDate',
   success = 'success',
