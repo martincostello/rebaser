@@ -44,7 +44,7 @@ describe('NuGetVersion', () => {
         expect(actual?.prerelease).toBe(prelease);
       });
     });
-    test.each([[''], [' '], ['NaN'], ['-1'], ['a'], ['<'], ['a.2.3.4'], ['1.b.3.4'], ['1.2.c.4'], ['1.2.3.d']])(
+    test.each([[''], [' '], ['NaN'], ['-1'], ['a'], ['<'], ['a.2.3.4'], ['1.b.3.4'], ['1.2.c.4'], ['1.2.3.d'], ['version']])(
       '"%s" as invalid',
       (value: string) => {
         const actual = NuGetVersion.tryParse(value);

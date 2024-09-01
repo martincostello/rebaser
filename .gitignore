@@ -1,7 +1,9 @@
 .DS_Store/
 .idea/
 .vs/
+bin/
 coverage/
+obj/
 lib/
 node_modules/
 
