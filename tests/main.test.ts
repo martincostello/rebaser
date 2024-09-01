@@ -289,6 +289,39 @@ describe('rebaser', () => {
     });
   });
 
+  describe('when a prerelease has conflicts', () => {
+    let fixture: ActionFixture;
+
+    beforeAll(async () => {
+      fixture = await runFixture('Prerelease');
+    }, rebaseTimeout);
+
+    afterAll(async () => {
+      await fixture?.destroy();
+    });
+
+    test('generates no errors', () => {
+      expect(core.error).toHaveBeenCalledTimes(0);
+      expect(core.setFailed).toHaveBeenCalledTimes(0);
+    });
+
+    test('outputs the correct result', () => {
+      expect(fixture.getOutput('result')).toBe('success');
+    });
+
+    test('rebases the branch', async () => {
+      expect(await fixture.commitHistory(3)).toEqual(['Apply target', 'Apply patch', 'Apply base']);
+    });
+
+    test('matches the snapshot', async () => {
+      expect(await fixture.getFileContent('global.json')).toMatchSnapshot();
+    });
+
+    test('matches the snapshot', async () => {
+      expect(await fixture.getFileContent('Project.csproj')).toMatchSnapshot();
+    });
+  });
+
   describe('when branch is up-to-date', () => {
     let fixture: ActionFixture;
 
