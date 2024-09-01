@@ -135,6 +135,8 @@ describe('NuGetVersion', () => {
       ['8.0.0-preview.2.23128.3', '7.0.4', 1],
       ['8.0.0-preview.6.23329.11', '8.0.0-preview.7.23375.9', -1],
       ['8.0.0-preview.7.23375.9', '8.0.0-preview.6.23329.11', 1],
+      ['9.0.100-preview.7.24407.12', '9.0.100-rc.1.24413.1', -1],
+      ['9.0.100-rc.1.24413.1', '9.0.100-preview.7.24407.12', 1],
     ])('"%s" and "%s"', (left: string, right: string, expected: number) => {
       const first = NuGetVersion.tryParse(left);
       const second = NuGetVersion.tryParse(right);
@@ -159,6 +161,8 @@ describe('NuGetVersion', () => {
       ['1.2.3-alpha.1.2.3'],
       ['8.0.0-preview.2.23128.3'],
       ['8.0.100-preview.2'],
+      ['9.0.100-preview.7.24407.12'],
+      ['9.0.100-rc.1.24413.1'],
     ])('"%s"', (value: string) => {
       const actual = NuGetVersion.tryParse(value);
       expect(actual?.toString()).toBe(value);
