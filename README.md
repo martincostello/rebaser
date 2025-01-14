@@ -1,6 +1,6 @@
 # Rebaser
 
-[![Build status](https://github.com/martincostello/rebaser/workflows/build/badge.svg?branch=main&event=push)](https://github.com/martincostello/rebaser/actions?query=workflow%3Abuild+branch%3Amain+event%3Apush)
+[![Build status](https://github.com/martincostello/rebaser/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/martincostello/rebaser/actions/workflows/build.yml?query=branch%3Amain+event%3Apush)
 [![codecov](https://codecov.io/gh/martincostello/rebaser/branch/main/graph/badge.svg)](https://codecov.io/gh/martincostello/rebaser)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/martincostello/rebaser/badge)](https://securityscorecards.dev/viewer/?uri=github.com/martincostello/rebaser)
 
