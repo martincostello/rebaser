@@ -41,7 +41,7 @@ jobs:
           $gitStatus = (git status --porcelain)
 
           if ([string]::IsNullOrEmpty($gitStatus)) {
-            Write-Host "No changes to commit."
+            Write-Output "No changes to commit."
             exit 0
           }
 
@@ -53,7 +53,7 @@ jobs:
           git rev-parse --verify --quiet "remotes/origin/${branchName}" | Out-Null
 
           if ($LASTEXITCODE -eq 0) {
-            Write-Host "Branch ${branchName} already exists."
+            Write-Output "Branch ${branchName} already exists."
             exit 0
           }
 
@@ -62,7 +62,7 @@ jobs:
           git commit -m "Regenerate dist`n`nRegenerate the contents of dist."
 
           if ($LASTEXITCODE -ne 0) {
-            Write-Host "No changes to commit."
+            Write-Output "No changes to commit."
             exit 0
           }
 
