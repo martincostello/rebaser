@@ -19,6 +19,7 @@ export async function run(): Promise<void> {
     const result = await tryRebase(options);
 
     core.setOutput('result', result.toString());
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     core.error(error);
     if (error instanceof Error) {
