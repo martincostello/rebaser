@@ -16,7 +16,7 @@ async function rebase(git: SimpleGit, options: TaskOptions): Promise<RebaseResul
     const result = await git.rebase(options);
     core.debug(`Rebase result:\n${result}`);
     return result?.includes('up to date') ? RebaseResult.upToDate : RebaseResult.success;
-  } catch (error: any) {
+  } catch (error) {
     core.debug(`Rebase failed:\n${error}`);
     return RebaseResult.conflicts;
   }

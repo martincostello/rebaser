@@ -36,7 +36,7 @@ function tryParseVersionFromJson(value: string): Dependency | null {
         }
       }
     }
-  } catch (error: any) {
+  } catch {
     // Not valid JSON
   }
 
@@ -68,8 +68,10 @@ function tryParseVersionFromXml(value: string): Dependency | null {
         };
       }
     }
-  } catch (error: any) {
+  } catch (error) {
     // Not a valid XML fragment
+    // eslint-disable-next-line no-console
+    console.log(`${error}`);
   }
 
   return null;
