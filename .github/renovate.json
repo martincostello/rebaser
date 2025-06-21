@@ -1,4 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "ignorePaths": ["**/fixtures/**"]
+  "ignorePaths": ["**/fixtures/**"],
+  "nuget": {
+    "enabled": false
+  }
 }
