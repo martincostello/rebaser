@@ -32,7 +32,7 @@ const markers = {
   ours: '>>>>>>>',
 };
 
-function tryResolveByLine(theirLine: string, ourLine: string): string | null {
+function tryResolvePackageByLine(theirLine: string, ourLine: string): string | null {
   const theirs = tryParseVersion(theirLine);
   const ours = tryParseVersion(ourLine);
 
@@ -82,7 +82,7 @@ function parseChunk(chunk: string[]): Chunk {
   return result;
 }
 
-function tryResolveByChunk(theirs: string[], ours: string[]): string[] | null {
+function tryResolvePackageByChunk(theirs: string[], ours: string[]): string[] | null {
   const theirChunk = parseChunk(theirs);
   const ourChunk = parseChunk(ours);
 
@@ -125,7 +125,35 @@ function tryResolveByChunk(theirs: string[], ours: string[]): string[] | null {
   return result;
 }
 
-async function tryResolvePackageConflicts(path: string): Promise<boolean> {
+async function tryResolveNuGetPackageConflicts(path: string): Promise<boolean> {
+  return await tryResolveFileConflicts(path, tryResolvePackageByLine, tryResolvePackageByChunk);
+}
+
+async function tryResolveDockerfileConflicts(path: string): Promise<boolean> {
+  const lineResolver: LineResolver = (theirLine, ourLine) => {
+    const theirs = tryParseVersion(theirLine);
+    const ours = tryParseVersion(ourLine);
+
+    if (theirs && ours && theirs.name === ours.name) {
+      if (theirs.version.compareTo(ours.version) > 0) {
+        core.debug(`Resolved conflict for ${theirs.name} with their version: ${theirs.version.toString()}`);
+        return theirLine;
+      } else {
+        core.debug(`Resolved conflict for ${ours.name} with our version: ${ours.version.toString()}`);
+        return ourLine;
+      }
+    }
+
+    return null;
+  };
+
+  return await tryResolveFileConflicts(path, lineResolver, () => null);
+}
+
+type ChunkResolver = (theirChunk: string[], ourChunk: string[]) => string[] | null;
+type LineResolver = (theirLine: string, ourLine: string) => string | null;
+
+async function tryResolveFileConflicts(path: string, lineResolver: LineResolver, chunkResolver: ChunkResolver): Promise<boolean> {
   const contents = await fs.promises.readFile(path, { encoding });
 
   const crlf = contents.includes('\r\n');
@@ -139,9 +167,9 @@ async function tryResolvePackageConflicts(path: string): Promise<boolean> {
   let line = 0;
 
   for (let i = 0; i < conflicts; i++) {
-    const theirIndex = lines.findIndex((p, index) => index > line && p.startsWith(markers.theirs));
-    const midpoint = lines.findIndex((p, index) => index > line && p.startsWith(markers.midpoint));
-    const ourIndex = lines.findIndex((p, index) => index > line && p.startsWith(markers.ours));
+    const theirIndex = lines.findIndex((p, index) => index >= line && p.startsWith(markers.theirs));
+    const midpoint = lines.findIndex((p, index) => index >= line && p.startsWith(markers.midpoint));
+    const ourIndex = lines.findIndex((p, index) => index >= line && p.startsWith(markers.ours));
 
     merged.push(...lines.slice(line, theirIndex));
 
@@ -154,7 +182,7 @@ async function tryResolvePackageConflicts(path: string): Promise<boolean> {
       for (let j = 0; j < theirs.length; j++) {
         const theirLine = theirs[j];
         const ourLine = ours[j];
-        const resolution = tryResolveByLine(theirLine, ourLine);
+        const resolution = lineResolver(theirLine, ourLine);
         if (resolution) {
           merged.push(resolution);
           resolvedConflict = true;
@@ -163,7 +191,7 @@ async function tryResolvePackageConflicts(path: string): Promise<boolean> {
         }
       }
     } else {
-      const resolution = tryResolveByChunk(theirs, ours);
+      const resolution = chunkResolver(theirs, ours);
       if (resolution) {
         merged.push(...resolution);
         resolvedConflict = true;
@@ -188,9 +216,12 @@ async function tryResolvePackageConflicts(path: string): Promise<boolean> {
 
 export async function tryResolveConflicts(path: string): Promise<boolean> {
   core.debug(`Attempting to resolve conflicts in '${path}'`);
-  if (basename(path) === 'package-lock.json') {
+  const fileName = basename(path);
+  if (fileName === 'package-lock.json') {
     return await tryResolveNpmLockFileConflicts(path);
+  } else if (fileName === 'Dockerfile') {
+    return await tryResolveDockerfileConflicts(path);
   } else {
-    return await tryResolvePackageConflicts(path);
+    return await tryResolveNuGetPackageConflicts(path);
   }
 }
