@@ -4,6 +4,46 @@
 import { XMLParser } from 'fast-xml-parser';
 import { NuGetVersion } from './NuGetVersion';
 
+function tryParseVersionFromDockerfile(value: string): Dependency | null {
+  if (!value.startsWith('FROM')) {
+    return null;
+  }
+
+  const container = value.trim();
+  const parts = container.split(' ');
+
+  if (parts.length < 2) {
+    return null;
+  }
+
+  let image = parts[1];
+
+  // If the image starts with '--', it is a Dockerfile ARG variable, so use the next part
+  if (image.startsWith('--')) {
+    if (parts.length < 3) {
+      return null;
+    }
+    image = parts[2];
+  }
+
+  const imageParts = image.split(':');
+
+  const name = imageParts[0];
+  const label = imageParts[1] || '';
+
+  const labelNoDigest = label.split('@')[0];
+
+  const version = NuGetVersion.tryParse(labelNoDigest);
+  if (version) {
+    return {
+      name,
+      version,
+    };
+  }
+
+  return null;
+}
+
 function tryParseVersionFromJson(value: string): Dependency | null {
   if (value.startsWith('<')) {
     return null;
@@ -79,8 +119,13 @@ function tryParseVersionFromXml(value: string): Dependency | null {
 
 export function tryParseVersion(value: string): Dependency | null {
   let version = tryParseVersionFromXml(value);
+
   if (!version) {
     version = tryParseVersionFromJson(value);
+  }
+
+  if (!version) {
+    version = tryParseVersionFromDockerfile(value);
   }
 
   return version;

@@ -107,6 +107,35 @@ describe('rebaser', () => {
     });
   });
 
+  describe('when Dockerfile has conflicts', () => {
+    let fixture: ActionFixture;
+
+    beforeAll(async () => {
+      fixture = await runFixture('Dockerfile');
+    }, rebaseTimeout);
+
+    afterAll(async () => {
+      await fixture?.destroy();
+    });
+
+    test('generates no errors', () => {
+      expect(core.error).toHaveBeenCalledTimes(0);
+      expect(core.setFailed).toHaveBeenCalledTimes(0);
+    });
+
+    test('outputs the correct result', () => {
+      expect(fixture.getOutput('result')).toBe('success');
+    });
+
+    test('rebases the branch', async () => {
+      expect(await fixture.commitHistory(3)).toEqual(['Apply target', 'Apply patch', 'Apply base']);
+    });
+
+    test('matches the snapshot', async () => {
+      expect(await fixture.getFileContent('Dockerfile')).toMatchSnapshot();
+    });
+  });
+
   describe('when package.json has conflicts', () => {
     let fixture: ActionFixture;
 
