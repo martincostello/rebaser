@@ -96,8 +96,9 @@ export class NuGetVersion {
           if (isNaN(thisPartNumber) || isNaN(otherPartNumber)) {
             // If the parts are not numbers, compare them as strings;
             // if they are equal, continue processing otherwise stop.
-            if (thisPart.localeCompare(otherPart) !== 0) {
-              break;
+            const comparison = thisPart.localeCompare(otherPart);
+            if (comparison !== 0) {
+              return comparison;
             }
           } else {
             if (thisPartNumber !== otherPartNumber) {
