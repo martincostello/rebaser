@@ -79,6 +79,34 @@ export class NuGetVersion {
     } else if (this.build !== other.build) {
       return this.build > other.build ? 1 : -1;
     } else if (this.prerelease && other.prerelease) {
+      // Break the components down into parts and compare
+      // numerically so that 1000 is greater than 999 etc.
+      const thisParts = this.prerelease.split('.');
+      const otherParts = other.prerelease.split('.');
+
+      if (thisParts.length === otherParts.length) {
+        for (let i = 0; i < thisParts.length; i++) {
+          const thisPart = thisParts[i];
+          const otherPart = otherParts[i];
+
+          const radix = 10;
+          const thisPartNumber = parseInt(thisPart, radix);
+          const otherPartNumber = parseInt(otherPart, radix);
+
+          if (isNaN(thisPartNumber) || isNaN(otherPartNumber)) {
+            // If the parts are not numbers, compare them as strings;
+            // if they are equal, continue processing otherwise stop.
+            if (thisPart.localeCompare(otherPart) !== 0) {
+              break;
+            }
+          } else {
+            if (thisPartNumber !== otherPartNumber) {
+              return thisPartNumber > otherPartNumber ? 1 : -1;
+            }
+          }
+        }
+      }
+
       return this.prerelease.localeCompare(other.prerelease);
     }
     return this.prerelease ? -1 : other.prerelease ? 1 : 0;

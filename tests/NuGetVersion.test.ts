@@ -19,6 +19,8 @@ describe('NuGetVersion', () => {
       ['1.2.3-alpha.1.2.3', 1, 2, 3, -1, 'alpha.1.2.3'],
       ['8.0.0-preview.2.23128.3', 8, 0, 0, -1, 'preview.2.23128.3'],
       ['8.0.100-preview.2', 8, 0, 100, -1, 'preview.2'],
+      ['2.0.0-pr.264.945', 2, 0, 0, -1, 'pr.264.945'],
+      ['2.0.0-pr.264.1066', 2, 0, 0, -1, 'pr.264.1066'],
     ])('"%s"', (value: string, major: number, minor: number, patch: number, build: number, prelease: string) => {
       let actual: NuGetVersion | null;
       beforeAll(() => {
@@ -137,6 +139,8 @@ describe('NuGetVersion', () => {
       ['8.0.0-preview.7.23375.9', '8.0.0-preview.6.23329.11', 1],
       ['9.0.100-preview.7.24407.12', '9.0.100-rc.1.24413.1', -1],
       ['9.0.100-rc.1.24413.1', '9.0.100-preview.7.24407.12', 1],
+      ['2.0.0-pr.264.945', '2.0.0-pr.264.1066', -1],
+      ['2.0.0-pr.264.1066', '2.0.0-pr.264.945', 1],
     ])('"%s" and "%s"', (left: string, right: string, expected: number) => {
       const first = NuGetVersion.tryParse(left);
       const second = NuGetVersion.tryParse(right);
