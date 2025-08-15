@@ -14,11 +14,11 @@ Its functionality is based on [this small .NET command-line application][rebaser
 
 ```yml
 steps:
-- uses: actions/checkout@v3
+- uses: actions/checkout@v5
   with:
     ref: 'my-branch'
     fetch-depth: 0
-- uses: martincostello/rebaser@v1
+- uses: martincostello/rebaser@v2
 ```
 
 ### Example Workflow
