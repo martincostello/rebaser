@@ -1,6 +1,6 @@
 {
   "name": "rebaser",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "private": true,
   "description": "A GitHub Action that attempts to rebase the current branch of a Git repository.",
   "main": "lib/main.js",
