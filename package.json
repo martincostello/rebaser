@@ -6,13 +6,13 @@
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
-    "check-dist": "npm run build && npm run package",
     "format": "prettier --write eslint.config.mjs src/**/*.ts tests/**/*.ts",
     "format-check": "prettier --check eslint.config.mjs src/**/*.ts tests/**/*.ts",
+    "generate": "npm run build && npm run package",
     "lint": "eslint src/**/*.ts --fix",
     "package": "esbuild lib/main.js --bundle --minify --outdir=dist --packages=bundle --platform=node --sourcemap --target=node24.0.0",
     "test": "jest",
-    "publish": "npm run build && npm run format && npm run lint && npm run package",
+    "publish": "npm run format && npm run lint && npm run generate",
     "all": "npm run publish && npm test"
   },
   "repository": {
@@ -53,12 +53,12 @@
   },
   "homepage": "https://github.com/martincostello/rebaser#readme",
   "dependencies": {
-    "@actions/core": "^1.11.1",
-    "@actions/exec": "^1.1.1",
-    "@actions/github": "^6.0.1",
-    "@actions/io": "^1.1.3",
-    "fast-xml-parser": "^5.2.5",
-    "simple-git": "^3.28.0"
+    "@actions/core": "1.11.1",
+    "@actions/exec": "1.1.1",
+    "@actions/github": "6.0.1",
+    "@actions/io": "1.1.3",
+    "fast-xml-parser": "5.2.5",
+    "simple-git": "3.28.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.3.1",
