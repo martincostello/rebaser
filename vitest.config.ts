@@ -5,7 +5,7 @@ export default defineConfig({
     clearMocks: true,
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      reporter: ['html', 'json', 'text'],
       include: ['src/**/*.ts'],
     },
     reporters: ['default', 'github-actions'],
