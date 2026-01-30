@@ -42,7 +42,7 @@
     "@actions/exec": "2.0.0",
     "@actions/github": "8.0.1",
     "@actions/io": "2.0.0",
-    "fast-xml-parser": "5.3.3",
+    "fast-xml-parser": "5.3.4",
     "simple-git": "3.30.0"
   },
   "devDependencies": {
