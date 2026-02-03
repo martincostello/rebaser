@@ -2,13 +2,12 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
+import { context } from '@actions/github';
 
-import { Context } from '@actions/github/lib/context';
 import { RebaseResult, tryRebase } from './Rebaser';
 
 export async function run(): Promise<void> {
   try {
-    const context = new Context();
     const options = {
       repository: core.getInput('repository', { required: false }) || process.cwd(),
       targetBranch: core.getInput('branch', { required: false }) || context.payload.repository?.['default_branch'] || 'main',
