@@ -182,7 +182,6 @@ export class ActionFixture {
   }
 
   private setupMocks(): void {
-    // Reset all mocks before each test
     vi.mocked(core.setFailed).mockImplementation(() => {});
     this.setupLogging();
   }

@@ -3,7 +3,6 @@
 
 import { vi } from 'vitest';
 
-// Mock @actions/core to make it mockable in ESM
 vi.mock('@actions/core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@actions/core')>();
   return {
