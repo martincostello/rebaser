@@ -43,7 +43,7 @@
     "@actions/github": "9.0.0",
     "@actions/io": "3.0.2",
     "fast-xml-parser": "5.3.6",
-    "simple-git": "3.30.0"
+    "simple-git": "3.31.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.3.3",
