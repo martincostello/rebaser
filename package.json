@@ -46,7 +46,7 @@
     "simple-git": "3.31.1"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "3.3.3",
+    "@eslint/eslintrc": "3.3.4",
     "@eslint/js": "9.39.3",
     "@stylistic/eslint-plugin": "5.8.0",
     "@types/node": "25.3.0",
