@@ -56,7 +56,7 @@
     "@vitest/eslint-plugin": "1.6.9",
     "@vitest/ui": "4.0.18",
     "esbuild": "0.27.3",
-    "eslint": "9.39.3",
+    "eslint": "9.39.4",
     "eslint-plugin-github": "6.0.0",
     "eslint-plugin-prettier": "5.5.5",
     "fast-check": "4.5.3",
