@@ -49,6 +49,7 @@ export async function tryRebase(options: {
       `user.email=${options.userEmail}`,
       `user.name=${options.userName}`,
     ],
+    unsafe: { allowUnsafeEditor: true },
   });
 
   let result = RebaseResult.success;
