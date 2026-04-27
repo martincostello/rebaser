@@ -40,7 +40,7 @@
   "dependencies": {
     "@actions/core": "3.0.0",
     "@actions/exec": "3.0.0",
-    "@actions/github": "9.1.0",
+    "@actions/github": "9.1.1",
     "@actions/io": "3.0.2",
     "fast-xml-parser": "5.7.1",
     "simple-git": "3.36.0"
