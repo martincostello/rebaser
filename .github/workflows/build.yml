@@ -17,7 +17,7 @@ permissions: {}
 
 jobs:
   build:
-    name: ${{ matrix.os }}
+    name: ${{ matrix.os-name }}
     runs-on: ${{ matrix.os }}
 
     permissions:
@@ -29,11 +29,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest
+          # renovate: datasource=github-runners depType=github-runner
+          - os: macos-26
             os-name: macos
-          - os: ubuntu-latest
+          # renovate: datasource=github-runners depType=github-runner
+          - os: ubuntu-24.04
             os-name: linux
-          - os: windows-latest
+          # renovate: datasource=github-runners depType=github-runner
+          - os: windows-2025
             os-name: windows
 
     steps:
@@ -61,7 +64,6 @@ jobs:
       name: Upload coverage to Codecov
       with:
         flags: ${{ matrix.os-name }}
-        token: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Generate SBOM
       uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
@@ -80,7 +82,7 @@ jobs:
         subject-path: ./dist/**/*.js
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     permissions:
       actions: read

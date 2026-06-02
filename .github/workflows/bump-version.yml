@@ -15,13 +15,28 @@ permissions: {}
 
 jobs:
   bump-version:
-    runs-on: [ ubuntu-latest ]
+    runs-on: ubuntu-24.04
+    if: github.event.repository.fork == false
 
     concurrency:
       group: ${{ github.workflow }}
       cancel-in-progress: false
 
+    environment:
+      name: write
+      deployment: false
+
+    permissions:
+      id-token: write
+
     steps:
+
+      - name: Get GitHub token
+        id: get-github-token
+        # zizmor: ignore[ref-version-mismatch] False positive
+        uses: martincostello/github-automation/actions/get-github-token@16711f5c6f94e59ee14b83697acb675be1528856 # get-github-token/v4.1.0
+        with:
+          profile-name: write
 
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -29,7 +44,7 @@ jobs:
           filter: 'tree:0'
           persist-credentials: true # zizmor: ignore[artipacked] Needed to push commits
           show-progress: false
-          token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          token: ${{ steps.get-github-token.outputs.token }}
 
       - name: Bump version
         id: bump-version
@@ -57,7 +72,7 @@ jobs:
           $json.packages.''.version = $updatedVersion
           $json | ConvertTo-Json -Depth 32 | Set-Content $fileName
 
-          "version=${updatedVersion}" >> $env:GITHUB_OUTPUT
+          "version=${updatedVersion}" >> ${env:GITHUB_OUTPUT}
 
       - name: Push changes to GitHub
         id: push-changes
@@ -93,9 +108,9 @@ jobs:
           git commit -m "Bump version`n`nBump version to ${env:NEXT_VERSION} for the next release." -s
           git push -u origin $branchName
 
-          "branch-name=${branchName}" >> $env:GITHUB_OUTPUT
-          "updated-version=true" >> $env:GITHUB_OUTPUT
-          "version=${env:NEXT_VERSION}" >> $env:GITHUB_OUTPUT
+          "branch-name=${branchName}" >> ${env:GITHUB_OUTPUT}
+          "updated-version=true" >> ${env:GITHUB_OUTPUT}
+          "version=${env:NEXT_VERSION}" >> ${env:GITHUB_OUTPUT}
 
       - name: Create pull request
         if: steps.push-changes.outputs.updated-version == 'true'
@@ -105,7 +120,7 @@ jobs:
           HEAD_BRANCH: ${{ steps.push-changes.outputs.branch-name }}
           NEXT_VERSION: ${{ steps.push-changes.outputs.version }}
         with:
-          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          github-token: ${{ steps.get-github-token.outputs.token }}
           script: |
             const nextVersion = process.env.NEXT_VERSION;
             const { repo, owner } = context.repo;
@@ -117,7 +132,7 @@ jobs:
               repo,
               head: process.env.HEAD_BRANCH,
               base: process.env.BASE_BRANCH,
-              draft: true,
+              draft: false,
               body: [
                 `Bump version to \`${nextVersion}\` for the next release.`,
                 '',
@@ -157,12 +172,15 @@ jobs:
             }
 
   close-milestone:
-    runs-on: [ ubuntu-latest ]
+    runs-on: ubuntu-24.04
     if: github.event_name == 'release'
 
     concurrency:
       group: ${{ github.workflow }}
       cancel-in-progress: false
+
+    permissions:
+      issues: write
 
     steps:
 
@@ -172,7 +190,7 @@ jobs:
           RELEASE_DATE: ${{ github.event.release.published_at }}
           RELEASE_VERSION: ${{ github.event.release.tag_name }}
         with:
-          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { repo, owner } = context.repo;
 
