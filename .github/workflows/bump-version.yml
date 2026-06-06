@@ -127,42 +127,11 @@ jobs:
             exit 0
           }
 
-          function Get-RemoteContent([string] $filePath, [string] $commit) {
-            $currentFile = gh api "repos/${env:GITHUB_REPOSITORY}/contents/${filePath}?ref=${commit}" | ConvertFrom-Json
-
-            if ($null -ne $currentFile.content) {
-              return $currentFile.content.Replace("`r", "").Replace("`n", "")
-            }
-
-            if (-not [string]::IsNullOrWhiteSpace($currentFile.download_url)) {
-              $downloadPath = Join-Path ${env:RUNNER_TEMP} ([System.IO.Path]::GetRandomFileName())
-
-              try {
-                Invoke-WebRequest -Uri $currentFile.download_url -OutFile $downloadPath | Out-Null
-                return [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($downloadPath))
-              } finally {
-                if (Test-Path $downloadPath) {
-                  Remove-Item $downloadPath -Force
-                }
-              }
-            }
-
-            if (-not [string]::IsNullOrWhiteSpace($currentFile.git_url)) {
-              $currentBlob = gh api $currentFile.git_url | ConvertFrom-Json
-
-              if ($null -ne $currentBlob.content) {
-                return $currentBlob.content.Replace("`r", "").Replace("`n", "")
-              }
-            }
-
-            throw "Failed to get content for ${filePath} from the GitHub contents API response."
-          }
-
           $edits = @()
 
           foreach ($filePath in $editedFiles) {
-            $fileFullPath = Join-Path ${env:GITHUB_WORKSPACE} $filePath
-            $currentContent = Get-RemoteContent $filePath $baseSha
+            $currentFile = gh api "repos/${env:GITHUB_REPOSITORY}/contents/${filePath}?ref=${baseSha}" | ConvertFrom-Json
+            $currentContent = $currentFile.content.Replace("`r", "").Replace("`n", "")
             $localContent = [System.Convert]::ToBase64String(
               [System.IO.File]::ReadAllBytes($fileFullPath))
             
