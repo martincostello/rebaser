@@ -432,6 +432,30 @@ describe('rebaser', () => {
     });
   });
 
+  describe('when the rebase fails for a reason other than conflicts', () => {
+    let fixture: ActionFixture;
+
+    beforeAll(async () => {
+      fixture = new ActionFixture();
+      await fixture.initialize();
+      await fixture.setupRepositoryFromFixture('global.json');
+      process.env.INPUT_BRANCH = 'this-branch-does-not-exist';
+      await fixture.run();
+    }, rebaseTimeout * 2);
+
+    afterAll(async () => {
+      await fixture?.destroy();
+    });
+
+    test('outputs the correct result', () => {
+      expect(fixture.getOutput('result')).toBe('error');
+    });
+
+    test('reports the underlying error', () => {
+      expect(fixture.errors.join('\n')).toContain('error other than file conflicts');
+    });
+  });
+
   describe.skip.each([['', '', '']])(
     'when an existing repository is rebased',
     (repository: string, baseBranch: string, targetBranch: string) => {

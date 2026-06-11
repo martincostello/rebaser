@@ -11,14 +11,15 @@ import { SimpleGit, TaskOptions, simpleGit } from 'simple-git';
 
 import { tryResolveConflicts } from './Resolver';
 
-async function rebase(git: SimpleGit, options: TaskOptions): Promise<RebaseResult> {
+async function rebase(git: SimpleGit, options: TaskOptions): Promise<RebaseOutcome> {
   try {
     const result = await git.rebase(options);
     core.debug(`Rebase result:\n${result}`);
-    return result?.includes('up to date') ? RebaseResult.upToDate : RebaseResult.success;
+    return { result: result?.includes('up to date') ? RebaseResult.upToDate : RebaseResult.success };
   } catch (error) {
-    core.debug(`Rebase failed:\n${error}`);
-    return RebaseResult.conflicts;
+    const message = error instanceof Error ? error.message : String(error);
+    core.debug(`Rebase failed:\n${message}`);
+    return { result: RebaseResult.conflicts, error: message };
   }
 }
 
@@ -58,11 +59,25 @@ export async function tryRebase(options: {
   const isInteractive = process.env.REBASER_INTERACTIVE === 'true' && process.env.GITHUB_ACTIONS !== 'true';
 
   try {
-    while ((result = await rebase(git, rebaseOptions)) === RebaseResult.conflicts) {
+    while (true) {
+      const outcome = await rebase(git, rebaseOptions);
+      result = outcome.result;
+
+      if (result !== RebaseResult.conflicts) {
+        break;
+      }
+
       const filesWithConflicts = await getFilesWithConflicts(git, options.repository);
 
       if (filesWithConflicts.length === 0) {
-        core.warning('Failed to determine files with conflicts.');
+        // The rebase stopped but there are no files with conflicts to resolve, so it
+        // failed for some reason other than merge conflicts (for example a fatal Git
+        // error, such as being unable to fetch an object from a promisor remote when
+        // the repository is a partial clone). Surface the underlying error so that the
+        // cause is visible without debug logging being enabled.
+        core.error(
+          `Failed to rebase onto ${options.targetBranch} due to an error other than file conflicts:\n${outcome.error ?? 'Unknown error.'}`
+        );
         result = RebaseResult.error;
         break;
       }
@@ -127,3 +142,8 @@ export enum RebaseResult {
   conflicts = 'conflicts',
   error = 'error',
 }
+
+type RebaseOutcome = {
+  result: RebaseResult;
+  error?: string;
+};

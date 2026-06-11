@@ -20,6 +20,7 @@ import { run } from '../src/main';
 
 export class ActionFixture {
   public stepSummary: string = '';
+  public errors: string[] = [];
   public baseBranch: string;
   public targetBranch: string;
   private repository: string = '';
@@ -204,6 +205,7 @@ export class ActionFixture {
       logger('warning', arg);
     });
     vi.mocked(core.error).mockImplementation((arg) => {
+      this.errors.push(arg instanceof Error ? arg.message : arg);
       logger('error', arg);
     });
 
