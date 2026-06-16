@@ -9,8 +9,12 @@ import { RebaseResult, tryRebase } from './Rebaser';
 export async function run(): Promise<void> {
   try {
     const options = {
+      apiUrl: context.apiUrl,
+      owner: context.repo.owner,
+      repo: context.repo.repo,
       repository: core.getInput('repository', { required: false }) || process.cwd(),
       targetBranch: core.getInput('branch', { required: false }) || context.payload.repository?.['default_branch'] || 'main',
+      token: core.getInput('repository-token', { required: false }) || process.env.GITHUB_TOKEN || '',
       userEmail: core.getInput('user-email', { required: false }) || 'github-actions[bot]@users.noreply.github.com',
       userName: core.getInput('user-name', { required: false }) || 'github-actions[bot]',
     };

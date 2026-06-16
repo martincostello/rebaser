@@ -23,6 +23,8 @@ export class ActionFixture {
   public errors: string[] = [];
   public baseBranch: string;
   public targetBranch: string;
+  public readonly owner: string = 'rebaser-tests';
+  public readonly repo: string = 'rebaser';
   private repository: string = '';
   private tempDir: string = '';
   private outputPath: string = '';
@@ -159,6 +161,10 @@ export class ActionFixture {
     await commitChanges(this.tempDir, message);
   }
 
+  async gitExec(args: string[]): Promise<string> {
+    return await execGit(args, this.tempDir);
+  }
+
   async diff(count: number = 1): Promise<string[]> {
     const fileNames = await execGit(['diff', `HEAD~${count}`, 'HEAD', '--name-only'], this.tempDir);
     return fileNames.split('\n').filter((p) => p.length > 0);
@@ -172,6 +178,8 @@ export class ActionFixture {
   private setupEnvironment(): void {
     const inputs = {
       GITHUB_OUTPUT: this.outputPath,
+      GITHUB_REPOSITORY: `${this.owner}/${this.repo}`,
+      GITHUB_TOKEN: 'fake-token',
       INPUT_BRANCH: this.baseBranch,
       INPUT_REPOSITORY: this.repository,
       RUNNER_DEBUG: '1',
