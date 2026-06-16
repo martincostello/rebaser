@@ -18,7 +18,7 @@ steps:
   with:
     ref: 'my-branch'
     fetch-depth: 0
-- uses: martincostello/rebaser@v2
+- uses: martincostello/rebaser@v3
 ```
 
 ### Example Workflow
@@ -52,7 +52,7 @@ jobs:
           ref: ${{ inputs.branch }}
 
       - name: Rebase ${{ inputs.branch }}
-        uses: martincostello/rebaser@v1
+        uses: martincostello/rebaser@v3
         id: rebase
 
       - name: Push changes
