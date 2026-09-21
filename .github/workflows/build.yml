@@ -33,7 +33,7 @@ jobs:
           - os: macos-26
             os-name: macos
           # renovate: datasource=github-runners depType=github-runner
-          - os: ubuntu-24.04
+          - os: ubuntu-26.04
             os-name: linux
           # renovate: datasource=github-runners depType=github-runner
           - os: windows-2025
